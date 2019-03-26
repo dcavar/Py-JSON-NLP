@@ -21,6 +21,16 @@ You might have to use *pip3* on some systems.
 
 
 
+## Packaging the Module
+
+To package the module, run the following command:
+
+    python3 setup.py sdist bdist_wheel
+
+This will generate a whl-package in the dist sub-folder.
+
+
+
 
 
 
