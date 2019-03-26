@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-(C) 2019 Damir Cavar, Oren Baldinger, ...
+(C) 2019 Damir Cavar, Oren Baldinger, Maanvitha Gongalla, Anurag Kumar, Murali Kammili
 
 Functions for manipulating and expanding an JSON-NLP object
 

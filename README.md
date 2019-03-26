@@ -1,6 +1,6 @@
 # Python JSON-NLP Module
 
-(C) 2019 by [Damir Cavar], , Oren Baldinger, Maanvitha Gongalla, Anurag Kumar, Murali Kammili
+(C) 2019 by [Damir Cavar], Oren Baldinger, Maanvitha Gongalla, Anurag Kumar, Murali Kammili
 
 Brought to you by the [NLP-Lab.org]!
 
