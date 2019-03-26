@@ -6,6 +6,16 @@ Brought to you by the [NLP-Lab.org]!
 
 
 
+## Packaging the Module
+
+To package the module, run the following command:
+
+    python3 setup.py sdist bdist_wheel
+
+This will generate a whl-package in the dist sub-folder.
+
+
+
 
 ## Introduction
 
@@ -19,15 +29,6 @@ To install this package, run the follwing command:
 
 You might have to use *pip3* on some systems.
 
-
-
-## Packaging the Module
-
-To package the module, run the following command:
-
-    python3 setup.py sdist bdist_wheel
-
-This will generate a whl-package in the dist sub-folder.
 
 
 
