@@ -13,7 +13,7 @@ Brought to you by the NLP-Lab.org (https://nlp-lab.org/)!
 
 name = "jsonnlp"
 
-__version__ = 0.2
+__version__ = "0.2.1"
 
 import datetime
 from collections import OrderedDict, defaultdict
