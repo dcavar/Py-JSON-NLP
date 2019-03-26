@@ -16,6 +16,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'conllu>=1.2.3',
+        'jsonschema>=3.0.1'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
