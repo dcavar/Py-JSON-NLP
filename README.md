@@ -14,7 +14,7 @@ The Python [JSON-NLP] module contains general mapping functions for [JSON-NLP] t
 
 ## Installation
 
-See for more details [JSON-NLP].
+For more details, see [JSON-NLP].
 
 This module is a wrapper for outputs from different NLP pipelines and modules into a standardized [JSON-NLP] format.
 
