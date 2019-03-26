@@ -5,32 +5,24 @@
 Brought to you by the [NLP-Lab.org]!
 
 
-
-## Packaging the Module
-
-To package the module, run the following command:
-
-    python3 setup.py sdist bdist_wheel
-
-This will generate a whl-package in the dist sub-folder.
-
-
-
-
 ## Introduction
+
+
+The Python [JSON-NLP] module contains general mapping functions for [JSON-NLP] to CONLL-U, a validator for the generated output, an Natural Language Processing (NLP) pipeline interface (for [Flair], [spaCy], [NLTK], [Polyglot], [Xrenner], etc.), and various utility functions.
+
+
+
+## Installation
 
 See for more details [JSON-NLP].
 
-This module is a wrapper for outputs from different Natural Language Processing pipelines and modules into a standardized JSON-NLP format.
+This module is a wrapper for outputs from different NLP pipelines and modules into a standardized [JSON-NLP] format.
 
-To install this package, run the follwing command:
+To install this package, run the following command:
 
-    pip install pyjsonnlp-0.2.0-py3-none-any.whl
+    pip install pyjsonnlp
 
 You might have to use *pip3* on some systems.
-
-
-
 
 
 
@@ -40,3 +32,8 @@ You might have to use *pip3* on some systems.
 [Damir Cavar]: http://damir.cavar.me/ "Damir Cavar"
 [NLP-Lab.org]: http://nlp-lab.org/ "NLP-Lab.org"
 [JSON-NLP]: https://github.com/dcavar/JSON-NLP "JSON-NLP"
+[Flair]: https://github.com/zalandoresearch/flair "Flair"
+[spaCy]: https://spacy.io/ "spaCy"
+[NLTK]: http://nltk.org/ "Natural Language Processing Toolkit"
+[Polyglot]: https://github.com/aboSamoor/polyglot "Polyglot" 
+[Xrenner]: https://github.com/amir-zeldes/xrenner "Xrenner"
