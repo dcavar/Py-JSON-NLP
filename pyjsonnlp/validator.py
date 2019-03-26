@@ -6,14 +6,15 @@ validator.py
 Validates the results of pipelines against the NLP-JSON schema.
 """
 
+
 import json
 from collections import OrderedDict
 from os.path import realpath, dirname, join
 
 from pyjsonnlp.pipeline import Pipeline
 from jsonschema import Draft7Validator, ValidationError
-
 from pyjsonnlp import remove_empty_fields
+
 
 validator = None
 
