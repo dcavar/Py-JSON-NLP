@@ -8,7 +8,7 @@ Brought to you by the [NLP-Lab.org]!
 ## Introduction
 
 
-The Python [JSON-NLP] module contains general mapping functions for [JSON-NLP] to CONLL-U, a validator for the generated output, an Natural Language Processing (NLP) pipeline interface (for [Flair], [spaCy], [NLTK], [Polyglot], [Xrenner], etc.), and various utility functions.
+The Python [JSON-NLP] module contains general mapping functions for [JSON-NLP] to [CoNLL-U], a validator for the generated output, an Natural Language Processing (NLP) pipeline interface (for [Flair], [spaCy], [NLTK], [Polyglot], [Xrenner], etc.), and various utility functions.
 
 
 
@@ -37,3 +37,4 @@ You might have to use *pip3* on some systems.
 [NLTK]: http://nltk.org/ "Natural Language Processing Toolkit"
 [Polyglot]: https://github.com/aboSamoor/polyglot "Polyglot" 
 [Xrenner]: https://github.com/amir-zeldes/xrenner "Xrenner"
+[CoNLL-U]: https://universaldependencies.org/format.html "CoNNL-U"

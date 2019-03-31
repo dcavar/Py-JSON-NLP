@@ -10,6 +10,7 @@ Validates the results of pipelines against the NLP-JSON schema.
 import json
 from collections import OrderedDict
 from os.path import realpath, dirname, join
+from typing import List, Tuple
 
 from pyjsonnlp.pipeline import Pipeline
 from jsonschema import Draft7Validator, ValidationError
@@ -19,7 +20,7 @@ from pyjsonnlp import remove_empty_fields
 validator = None
 
 
-def load_validator() -> Draft7Validator:
+def __load_validator() -> Draft7Validator:
     """
     Keep a single validator instance in memory
     :return: The Draft 7 validator
@@ -27,23 +28,24 @@ def load_validator() -> Draft7Validator:
     global validator
 
     if not validator:
-        with open(join(dirname(realpath(__file__)), 'JSON-NLP.schema.json'), 'r') as f:
+        with open(join(dirname(realpath(__file__)), 'NLP-JSON.schema.json'), 'r') as f:
             validator = Draft7Validator(json.load(f))
     return validator
 
 
-def is_valid(nlpjson: OrderedDict) -> bool:
+def is_valid(nlpjson: OrderedDict) -> Tuple[bool, List[str]]:
     """
     Validates a json-nlp ordered dictionary.
     :param nlpjson: The json-nlp to be validated
     :return: True if the json-nlp validates, False otherwise
     """
     valid = True
-    v = load_validator()
+    errors = []
+    v = __load_validator()
     for error in sorted(v.iter_errors(remove_empty_fields(nlpjson)), key=str):
-        print(format_error(error))
+        errors.append(format_error(error))
         valid = False
-    return valid
+    return valid, errors
 
 
 def validate_pipeline(pipeline: Pipeline, text: str) -> bool:
@@ -53,7 +55,7 @@ def validate_pipeline(pipeline: Pipeline, text: str) -> bool:
     :param text: String text to validate
     :return: True if the Pipeline validates, False otherwise
     """
-    return is_valid(pipeline.process(text=text))
+    return is_valid(pipeline.process(text=text))[0]
 
 
 def format_error(error: ValidationError) -> str:

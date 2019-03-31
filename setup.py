@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pyjsonnlp",
-    version="0.2.1",
+    version="0.2.2",
     author="Damir Cavar, Oren Baldinger, Maanvitha Gongalla, Anurag Kumar, Murali Kammili",
     author_email="damir@cavar.me",
     description="The Python JSON-NLP package",
@@ -23,4 +23,8 @@ setuptools.setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
+    data_files=[('pyjsonnlp', ['pyjsonnlp/NLP-JSON.schema.json'])],
+    setup_requires=["pytest-runner"],
+    test_suite="tests",
+    tests_require=["pytest", "coverage"]
 )
