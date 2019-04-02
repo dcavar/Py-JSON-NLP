@@ -11,10 +11,10 @@ Brought to you by the NLP-Lab.org (https://nlp-lab.org/)!
 """
 import datetime
 from collections import OrderedDict
-from typing import List, Dict
+from typing import List
 
 name = "pyjsonnlp"
-__version__ = "0.2.2"
+__version__ = "0.2.3"
 
 
 def get_base() -> OrderedDict:
@@ -26,9 +26,9 @@ def get_base() -> OrderedDict:
             "DC.source": "",  # where did the corpus come from
             "DC.created": datetime.datetime.now().replace(microsecond=0).isoformat(),
             "DC.date": datetime.datetime.now().replace(microsecond=0).isoformat(),
-            "DC.creator": "",  # ip address?
-            'DC.publisher': "",  # NLP-JSON?
-            "DC.title": "",  # maybe scrape from url?
+            "DC.creator": "",
+            'DC.publisher': "",
+            "DC.title": "",
             "DC.description": "",
             "DC.identifier": "",
             "DC.language": "",
@@ -42,11 +42,11 @@ def get_base() -> OrderedDict:
             "counts": {},
         },
         "conll": {},
-        "documents": []
+        "documents": {}
     })
 
 
-def get_base_document() -> OrderedDict:
+def get_base_document(doc_id: str) -> OrderedDict:
     """Returns a JSON base document."""
 
     return OrderedDict({
@@ -55,9 +55,9 @@ def get_base_document() -> OrderedDict:
             "DC.source": "",  # where did the corpus come from
             "DC.created": datetime.datetime.now().replace(microsecond=0).isoformat(),
             "DC.date": datetime.datetime.now().replace(microsecond=0).isoformat(),
-            "DC.creator": "",  # ip address?
-            'DC.publisher': "",  # NLP-JSON?
-            "DC.title": "",  # maybe scrape from url?
+            "DC.creator": "",
+            'DC.publisher': "",
+            "DC.title": "",
             "DC.description": "",
             "DC.identifier": "",
             "DC.language": "",
@@ -70,11 +70,12 @@ def get_base_document() -> OrderedDict:
             "DC.rights": "",
             "counts": {},
         },
+        "id": str(doc_id),
         "text": "",
-        "tokenList": [],
-        "clauses": [],
-        "sentences": [],
-        "paragraphs": [],
+        "tokenList": {},
+        "clauses": {},
+        "sentences": {},
+        "paragraphs": {},
         "dependencies": [],
         "coreferences": [],
         "constituents": [],
@@ -91,7 +92,7 @@ def remove_empty_fields(json_nlp: OrderedDict) -> OrderedDict:
     if 'meta' in cleaned:
         cleaned['meta'] = remove_empty_fields(cleaned['meta'])
     if 'documents' in cleaned:
-        for i, d in enumerate(cleaned['documents']):
+        for i, d in cleaned['documents'].items():
             cleaned['documents'][i] = remove_empty_fields(d)
     return cleaned
 
@@ -114,12 +115,6 @@ def find_head(doc: OrderedDict, token_ids: List[int], style='universal') -> int:
             t_id = arcs[t_id][0]['governor']
 
     return t_id
-
-
-def token_list_to_dict(token_list: List[dict]) -> Dict[int, dict]:
-    """Create a tokenList dictionary, for fast lookups"""
-
-    return dict([(t['id'], t) for t in token_list])
 
 
 def build_coreference(reference_id: int) -> dict:

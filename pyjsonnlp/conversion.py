@@ -10,7 +10,7 @@ Licensed under the Apache License 2.0, see the file LICENSE for more details.
 Brought to you by the NLP-Lab.org (https://nlp-lab.org/)!
 """
 from collections import OrderedDict, defaultdict
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
 
 import conllu
 
@@ -39,24 +39,32 @@ def parse_conllu(c: str, dependency_arc_style='universal') -> OrderedDict:
     # todo syntax, coref, and other conllu-plus columns
     # todo test par/sent/doc ids and par splitting
     """
+    par_num = 1
+    new_par_id = None
+    doc_num = 1
 
     def new_paragraph_mid_sentence():
+        nonlocal new_par_id, par_num
         # if an opening paragraph wasn't specified, retroactively create one
         if not document['paragraphs']:
-            document['paragraphs'].append({
-                'tokens': [t_id for t_id in document['tokenList']]
-            })
-            if 'newpar id' in sent.metadata:
-                document['paragraphs'][-1]['id'] = sent.metadata['newpar id']
+            new_par_id = str(sent.metadata.get('newpar id', par_num))
+            document['paragraphs'][new_par_id] = {
+                'id': new_par_id,
+                'tokens': [t_id for t_id in document['tokenList'].keys()]
+            }
+            par_num += 1
         # create the new paragraph
-        document['paragraphs'].append({
+        new_par_id = str(par_num)
+        document['paragraphs'][new_par_id] = {
+            'id': new_par_id,
             'tokens': []
-        })
+        }
+        par_num += 1
 
     def wrap_up_doc():
         if all(map(lambda ds: 'text' in ds, document['sentences'])):
             document['text'] = ' '.join(map(lambda ds: ds['text'], document['sentences']))
-        j['documents'].append(document)
+        j['documents'][document['id']] = document
 
     # init
     j: OrderedDict = get_base()
@@ -71,29 +79,28 @@ def parse_conllu(c: str, dependency_arc_style='universal') -> OrderedDict:
         if 'newdoc id' in sent.metadata or 'newdoc' in sent.metadata or document is None:
             if document is not None:
                 wrap_up_doc()
-            document = get_base_document()
-            if 'newdoc id' in sent.metadata:
-                document['id'] = sent.metadata['newdoc id']
+            new_doc_id = sent.metadata['newdoc id'] if 'newdoc id' in sent.metadata else str(doc_num)
+            doc_num += 1
+            document = get_base_document(new_doc_id)
 
         # paragraphs
-        if 'newpar id' in sent.metadata:
-            document['paragraphs'].append({
-                'id': str(sent.metadata.get('newpar id')),
-                'tokens': []
-            })
-        elif 'newpar' in sent.metadata:
-            document['paragraphs'].append({'tokens': []})
+        if 'newpar id' in sent.metadata or 'newpar' in sent.metadata:
+            new_par_id = str(sent.metadata.get('newpar id', par_num))
+            document['paragraphs'][new_par_id] = {'id': new_par_id, 'tokens': []}
+            par_num += 1
 
         # initialize a sentence
         if 'sent_id' in sent.metadata:
             j['conll']['sentence_ids'] = True
+        new_sent_id = sent.metadata.get('sent_id', str(sent_num))
+        sent_tokens: List[int] = []
         current_sent = {
-            'id': sent.metadata.get('sent_id', str(sent_num)),
+            'id': new_sent_id,
             'tokenFrom': token_id,
             'tokenTo': token_id + len(sent),
-            'tokens': []
+            'tokens': sent_tokens
         }
-        document['sentences'].append(current_sent)
+        document['sentences'][new_sent_id] = current_sent
 
         # sentence text
         if 'text' in sent.metadata:
@@ -151,9 +158,9 @@ def parse_conllu(c: str, dependency_arc_style='universal') -> OrderedDict:
             token_lookup[(sent_num, str_token_id)] = token_id
             current_sent['tokens'].append(token_id)
             if document['paragraphs']:
-                document['paragraphs'][-1].append('token_id')
+                document['paragraphs'][new_par_id]['tokens'].append('token_id')
+            document['tokenList'][token_id] = t
             token_id += 1
-            document['tokenList'].append(t)
 
         # expressions (now we handle id ranges)
         for token in sent:
