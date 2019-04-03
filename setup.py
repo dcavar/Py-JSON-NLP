@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pyjsonnlp",
-    version="0.2.3",
+    version="0.2.4",
     author="Damir Cavar, Oren Baldinger, Maanvitha Gongalla, Anurag Kumar, Murali Kammili",
     author_email="damir@cavar.me",
     description="The Python JSON-NLP package",
@@ -16,7 +16,10 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'conllu>=1.2.3',
-        'jsonschema>=3.0.1'
+        'jsonschema>=3.0.1',
+        'flask',
+        'iso639',
+        'bs4'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

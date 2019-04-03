@@ -17,5 +17,6 @@ from collections import OrderedDict
 
 
 class Pipeline(object):
-    def process(self, text='') -> OrderedDict:
+    @staticmethod
+    def process(text='', coreferences=False, constituents=False, dependencies=False, expressions=False, **kwargs) -> OrderedDict:
         raise NotImplementedError
