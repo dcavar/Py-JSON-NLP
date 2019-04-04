@@ -1,4 +1,36 @@
 import datetime
+from collections import OrderedDict
+
+from pyjsonnlp.microservices import Microservice
+
+from pyjsonnlp.pipeline import Pipeline
+
+
+class MockMicroservice(Microservice):
+    def get_text(self) -> str:
+        return 'mock text'
+
+    def write_json(self, j: OrderedDict):
+        return {'mock': 'json'}
+
+    def write_text(self, conll: str):
+        return 'mock conll'
+
+    def get_output_format(self) -> str:
+        return 'jsonnlp'
+
+    def get_args(self) -> dict:
+        return {'text': 'some text'}
+
+    def handle_error(self, error: Exception):
+        return None
+
+
+class MockPipeline(Pipeline):
+    @staticmethod
+    def process(text='', coreferences=False, constituents=False, dependencies=False, expressions=False,
+                **kwargs) -> OrderedDict:
+        return OrderedDict(**kwargs)
 
 
 class MockResponse:

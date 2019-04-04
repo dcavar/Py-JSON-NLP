@@ -28,57 +28,52 @@ class Microservice(object):
 
         self.route = base_route
 
-        self._with_deps = False
-        self._with_coref = False
-        self._with_constituents = False
-        self._with_expressions = False
+        self.__with_deps = False
+        self.__with_coref = False
+        self.__with_constituents = False
+        self.__with_expressions = False
 
     @property
     def with_coreferences(self):
-        return self._with_coref
+        return self.__with_coref
 
     @with_coreferences.setter
     def with_coreferences(self, value):
-        self._with_coref = bool(value)
+        self.__with_coref = bool(value)
 
     @property
     def with_constituents(self):
-        return self._with_constituents
+        return self.__with_constituents
 
     @with_constituents.setter
     def with_constituents(self, value):
-        self._with_constituents = bool(value)
+        self.__with_constituents = bool(value)
 
     @property
     def with_expressions(self):
-        return self._with_expressions
+        return self.__with_expressions
 
     @with_expressions.setter
     def with_expressions(self, value):
-        self._with_expressions = bool(value)
+        self.__with_expressions = bool(value)
 
     @property
     def with_dependencies(self):
-        return self._with_deps
+        return self.__with_deps
 
     @with_dependencies.setter
     def with_dependencies(self, value):
-        self._with_deps = bool(value)
+        self.__with_deps = bool(value)
 
-    def __get_output_format(self, output_format: str) -> str:
+    def check_output_format(self, output_format: str) -> str:
         """Clean up output format, check if it is valid before returning the normalized string"""
-        f = self.__normalize_format(output_format)
-        if not self.__allowed_format(f):
+        f = output_format.lower().replace('-', '')
+        if f not in self.allowed_formats:
             raise IOError(f'Allowed formats are {", ".join(self.allowed_formats)}')
         return f
 
     @staticmethod
-    def __normalize_format(f: str) -> str:
-        """Normalize the provided output format"""
-        return f.lower().replace('-', '')
-
-    @staticmethod
-    def __normalize_language(language: str) -> str:
+    def normalize_language(language: str) -> str:
         """Returns a 2-letter language code"""
         return iso639.to_name(language).lower()
 
@@ -98,12 +93,8 @@ class Microservice(object):
 
         return '\n'.join(filter(lambda s: len(s) > 1, soup.find('body').text.split('\n')))
 
-    def __allowed_format(self, f: str) -> bool:
-        """Predicate to check if the output format is valid"""
-        return f in self.allowed_formats
-
     def write_output(self, j: OrderedDict):
-        if self.__get_output_format(self.get_output_format()) == 'jsonnlp':
+        if self.check_output_format(self.get_output_format()) == 'jsonnlp':
             return self.write_json(j)
         else:
             return self.write_text(to_conllu(j))
