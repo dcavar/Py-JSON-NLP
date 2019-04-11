@@ -13,7 +13,7 @@ from os.path import realpath, dirname, join
 from typing import List, Tuple
 
 from pyjsonnlp.pipeline import Pipeline
-from jsonschema import Draft7Validator, ValidationError
+from jsonschemanlplab import Draft7Validator, ValidationError
 from pyjsonnlp import remove_empty_fields
 
 
