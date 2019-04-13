@@ -7,9 +7,14 @@ Brought to you by the [NLP-Lab.org]!
 
 ## Introduction
 
+There is a growing number of Natural Language Processing (NLP) tools, modules, pipelines. There does not seem to be any standard for the output format. Here we are focusing on a standard for the output format syntax. Some future version of [JSON-NLP] might address the output semantics as well.
 
-The Python [JSON-NLP] module contains general mapping functions for [JSON-NLP] to [CoNLL-U], a validator for the generated output, an Natural Language Processing (NLP) pipeline interface (for [Flair], [spaCy], [NLTK], [Polyglot], [Xrenner], etc.), and various utility functions.
+[JSON-NLP] is a standard for the most important outputs NLP pipelines and components can generate. The relevant documentation can be found in the [JSON-NLP] GitHub repo and on its website at the [NLP-Lab].
 
+
+The Python [JSON-NLP] module contains general mapping functions for [JSON-NLP] to [CoNLL-U], a validator for the generated output, an NLP pipeline interface (for [Flair], [spaCy], [NLTK], [Polyglot], [Xrenner], etc.), and various utility functions.
+
+There is a [Java JSON-NLP](https://github.com/dcavar/J-JSON-NLP) Maven module as well, and there are wrappers for numerous popular NLP pipelines and tools linked from the [NLP-Lab.org] website.
 
 
 ## Installation
@@ -94,6 +99,7 @@ Text is provided to the microservice with the `text` parameter, via either `GET`
 Other parameters specific to your pipeline implementation can be passed as well:
 
     http://localhost:5000?lang=en&constituents=0&text=I am a sentence.
+
 
 
 [Damir Cavar]: http://damir.cavar.me/ "Damir Cavar"
