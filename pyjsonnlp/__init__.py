@@ -14,11 +14,15 @@ from collections import OrderedDict
 from typing import List
 
 name = "pyjsonnlp"
-__version__ = "0.2.5"
+__version__ = "0.2.6"
 
 
 def get_base() -> OrderedDict:
-    """Return a base framework for JSON-NLP."""
+    """
+    Return a base framework for JSON-NLP.
+    :returns Base frame for a JSON-NLP object
+    :rtype OrderedDict
+    """
 
     return OrderedDict({
         "meta": {
@@ -46,7 +50,7 @@ def get_base() -> OrderedDict:
     })
 
 
-def get_base_document(doc_id: str) -> OrderedDict:
+def get_base_document(doc_id: int) -> OrderedDict:
     """Returns a JSON base document."""
 
     return OrderedDict({
@@ -70,7 +74,8 @@ def get_base_document(doc_id: str) -> OrderedDict:
             "DC.rights": "",
             "counts": {},
         },
-        "id": str(doc_id),
+        "id": doc_id,
+        "conllId": "",
         "text": "",
         "tokenList": {},
         "clauses": {},
@@ -135,6 +140,6 @@ def build_constituents(sent_id: int, s: str) -> dict:
     open_bracket = s[0]  # ( or [
     close_bracket = s[-1]  # ) or ]
     return {
-        'sent_id': sent_id,
+        'sentenceId': sent_id,
         'labeledBracketing': f'{open_bracket}ROOT {s}{close_bracket}' if s[1:5] != 'ROOT' else s
     }

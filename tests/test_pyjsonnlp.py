@@ -16,8 +16,8 @@ class TestJsonNlpConstruction(TestCase):
 
     def test_get_base_document(self):
         pyjsonnlp.__version__ = 0.1
-        actual = pyjsonnlp.get_base_document('doc #2')
-        expected = OrderedDict([('meta', {'DC.conformsTo': 0.1, 'DC.source': '', 'DC.created': '2019-01-25T17:04:34', 'DC.date': '2019-01-25T17:04:34', 'DC.creator': '', 'DC.publisher': '', 'DC.title': '', 'DC.description': '', 'DC.identifier': '', 'DC.language': '', 'DC.subject': '', 'DC.contributors': '', 'DC.type': '', 'DC.format': '', 'DC.relation': '', 'DC.coverage': '', 'DC.rights': '', 'counts': {}}), ('id', 'doc #2'), ('text', ''), ('tokenList', {}), ('clauses', {}), ('sentences', {}), ('paragraphs', {}), ('dependencies', []), ('coreferences', []), ('constituents', []), ('expressions', [])])
+        actual = pyjsonnlp.get_base_document(2)
+        expected = OrderedDict([('meta', {'DC.conformsTo': 0.1, 'DC.source': '', 'DC.created': '2019-01-25T17:04:34', 'DC.date': '2019-01-25T17:04:34', 'DC.creator': '', 'DC.publisher': '', 'DC.title': '', 'DC.description': '', 'DC.identifier': '', 'DC.language': '', 'DC.subject': '', 'DC.contributors': '', 'DC.type': '', 'DC.format': '', 'DC.relation': '', 'DC.coverage': '', 'DC.rights': '', 'counts': {}}), ('id', 2), ('conllId', ''), ('text', ''), ('tokenList', {}), ('clauses', {}), ('sentences', {}), ('paragraphs', {}), ('dependencies', []), ('coreferences', []), ('constituents', []), ('expressions', [])])
         assert actual == expected, actual
 
     def test_build_coreference(self):
@@ -27,12 +27,12 @@ class TestJsonNlpConstruction(TestCase):
 
     def test_build_constituents(self):
         actual = pyjsonnlp.build_constituents(0, "(NN text)")
-        expected = {'sent_id': 0, 'labeledBracketing': '(ROOT (NN text))'}
+        expected = {'sentenceId': 0, 'labeledBracketing': '(ROOT (NN text))'}
         assert expected == actual, actual
 
     def test_build_constituents_with_root(self):
         actual = pyjsonnlp.build_constituents(0, "[ROOT [NN text]]")
-        expected = {'sent_id': 0, 'labeledBracketing': '[ROOT [NN text]]'}
+        expected = {'sentenceId': 0, 'labeledBracketing': '[ROOT [NN text]]'}
         assert expected == actual, actual
 
 
