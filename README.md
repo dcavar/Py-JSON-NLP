@@ -45,8 +45,10 @@ Currently we have a [CoNLL-U] to [JSON-NLP] converter, that covers most annotati
 
     pyjsonnlp.conversion.parse_conllu(conllu_text)
     
-This functionality is still a work in progress.
+To convert the other direction:
 
+    pyjsonnlp.conversion.to_conllu(jsonnlp)
+    
 ## Pipeline
 
 [JSON-NLP] provides a simple `Pipeline` interface that should be implemented for embedding into a microservice:
