@@ -1,15 +1,20 @@
 # Python JSON-NLP Module
 
-(C) 2019 by [Damir Cavar], [Oren Baldinger], Maanvitha Gongalla, Anurag Kumar, Murali Kammili
+(C) 2019 by [Damir Cavar], [Oren Baldinger], [Maanvitha Gongalla], Anurag Kumar, Murali Kammili
 
 Brought to you by the [NLP-Lab.org]!
 
 
 ## Introduction
 
+There is a growing number of Natural Language Processing (NLP) tools, modules, pipelines. There does not seem to be any standard for the output format. Here we are focusing on a standard for the output format syntax. Some future version of [JSON-NLP] might address the output semantics as well.
 
-The Python [JSON-NLP] module contains general mapping functions for [JSON-NLP] to [CoNLL-U], a validator for the generated output, an Natural Language Processing (NLP) pipeline interface (for [Flair], [spaCy], [NLTK], [Polyglot], [Xrenner], etc.), and various utility functions.
+[JSON-NLP] is a standard for the most important outputs NLP pipelines and components can generate. The relevant documentation can be found in the [JSON-NLP] GitHub repo and on its website at the [NLP-Lab].
 
+
+The Python [JSON-NLP] module contains general mapping functions for [JSON-NLP] to [CoNLL-U], a validator for the generated output, an NLP pipeline interface (for [Flair], [spaCy], [NLTK], [Polyglot], [Xrenner], etc.), and various utility functions.
+
+There is a [Java JSON-NLP](https://github.com/dcavar/J-JSON-NLP) Maven module as well, and there are wrappers for numerous popular NLP pipelines and tools linked from the [NLP-Lab.org] website.
 
 
 ## Installation
@@ -96,8 +101,10 @@ Other parameters specific to your pipeline implementation can be passed as well:
     http://localhost:5000?lang=en&constituents=0&text=I am a sentence.
 
 
+
 [Damir Cavar]: http://damir.cavar.me/ "Damir Cavar"
 [Oren Baldinger]: https://oren.baldinger.me/ "Oren Baldinger"
+[Maanvitha Gongalla]: https://maanvithag.github.io/MaanvithaGongalla/
 [NLP-Lab.org]: http://nlp-lab.org/ "NLP-Lab.org"
 [JSON-NLP]: https://github.com/dcavar/JSON-NLP "JSON-NLP"
 [Flair]: https://github.com/zalandoresearch/flair "Flair"
