@@ -1,12 +1,57 @@
 from collections import OrderedDict
+from typing import List
 
 
 class Unifier(object):
     @staticmethod
-    def __copy_dicts(a: OrderedDict, b: OrderedDict):
+    def merge_tokens(a: List[int], b: List[int]) -> List[int]:
+        a.extend(b)
+        return list(set(a))
+
+    @staticmethod
+    def merge_coreferences(a: List[dict], b: List[dict]) -> List[dict]:
+        merged: List[dict] = []
+        heads = {}
+        # start by adding all coreferences from a
+        for coref in a:
+            heads[coref['representative']['head']] = coref
+            merged.append(coref)
+
+        for coref in b:
+            # add new heads cart-blanche
+            if coref['representative']['head'] not in heads:
+                heads[coref['representative']['head']] = coref
+                merged.append(coref)
+                coref['id'] = len(heads)
+            else:
+                # merge representative
+                a_rep = heads[coref['representative']['head']]['representative']
+                for k, v in coref['representative'].items():
+                    if k == 'tokens':
+                        a_rep[k] = Unifier.merge_tokens(a_rep[k], v)
+                    elif k not in a_rep:
+                        a_rep[k] = v
+
+                # merge references
+                a_refs = dict((ref['head'], ref) for ref in heads[coref['representative']['head']]['referents'])
+                for ref in coref['referents']:
+                    if ref['head'] not in a_refs:
+                        heads[coref['representative']['head']]['referents'].append(ref)
+                    else:
+                        for k, v in ref.items():
+                            if k == 'tokens':
+                                a_refs[ref['head']][k] = Unifier.merge_tokens(a_refs[ref['head']][k], v)
+                            elif k not in a_refs[ref['head']].keys():
+                                a_refs[ref['head']][k] = v
+
+        return merged
+
+    @staticmethod
+    def __copy_docs(a: OrderedDict, b: OrderedDict):
         new_doc = OrderedDict(a)
         from_doc = OrderedDict(b)
 
+        # verify that all token ids/texts line up exactly
         a_tokens = dict((k, {'id': v['id'], 'text': v['text']}) for k, v in a['tokenList'].items())
         b_tokens = dict((k, {'id': v['id'], 'text': v['text']}) for k, v in b['tokenList'].items())
         if a_tokens != b_tokens:
@@ -16,12 +61,22 @@ class Unifier(object):
 
     @staticmethod
     def overwrite_annotation_from_a_with_b(a: OrderedDict, b: OrderedDict, annotation: str) -> OrderedDict:
-        new_doc, from_doc = Unifier.__copy_dicts(a, b)
+        # recursively process all documents
+        if 'documents' in a and 'documents' in b:
+            new_json = OrderedDict(a)
+            for d_id in set(a['documents'].keys()) | set(b['documents'].keys()):
+                if d_id in a['documents'] and d_id in b['documents']:
+                    new_json['documents'][d_id] = Unifier.overwrite_annotation_from_a_with_b(a['documents'][d_id],
+                                                                                             b['documents'][d_id],
+                                                                                             annotation)
+            return new_json
+
+        new_doc, from_doc = Unifier.__copy_docs(a, b)
 
         if annotation == 'coreferences':
-            new_doc['coreferences'] = from_doc['coreferences']
+            new_doc['coreferences'] = from_doc.get('coreferences', [])
         if annotation == 'expressions':
-            new_doc['expressions'] = from_doc['expressions']
+            new_doc['expressions'] = from_doc.get('expressions', [])
         elif annotation == 'tokens':
             for t_a, t_b in zip(new_doc.get('tokenList', {}).values(), from_doc.get('tokenList', {}).values()):
                 for k, v in t_b.items():
@@ -39,15 +94,21 @@ class Unifier(object):
 
     @staticmethod
     def add_annotation_to_a_from_b(a: OrderedDict, b: OrderedDict, annotation: str) -> OrderedDict:
-        new_doc, from_doc = Unifier.__copy_dicts(a, b)
+        # recursively process all documents
+        if 'documents' in a and 'documents' in b:
+            new_json = OrderedDict(a)
+            for d_id in set(a['documents'].keys()) | set(b['documents'].keys()):
+                if d_id in a['documents'] and d_id in b['documents']:
+                    new_json['documents'][d_id] = Unifier.add_annotation_to_a_from_b(a['documents'][d_id],
+                                                                                     b['documents'][d_id],
+                                                                                     annotation)
+            return new_json
+
+        new_doc, from_doc = Unifier.__copy_docs(a, b)
 
         if annotation == 'coreferences':
-            for coref in from_doc.get('coreferences', []):
-                coref_shift = len(a.get('coreferences', []))
-                if 'coreferences' not in new_doc:
-                    new_doc['coreferences'] = []
-                new_doc['coreferences'].append(coref)
-                coref['id'] += coref_shift
+            new_doc['coreferences'] = Unifier.merge_coreferences(new_doc.get('coreferences', []),
+                                                                 from_doc.get('coreferences', []))
         elif annotation == 'tokens':
             for t_a, t_b in zip(new_doc.get('tokenList', {}).values(), from_doc.get('tokenList', {}).values()):
                 for k, v in t_b.items():
@@ -62,7 +123,7 @@ class Unifier(object):
                 expr_shift = len(a.get('expressions', []))
                 if 'expressions' not in new_doc:
                     new_doc['expressions'] = []
-                new_doc['coreferences'].append(expr)
+                new_doc['expressions'].append(expr)
                 expr['id'] += expr_shift
         else:
             raise UnificationError("Only 'coreferences', 'tokens', and 'expressions' are currently supported!")
@@ -71,6 +132,15 @@ class Unifier(object):
 
     @staticmethod
     def extend_a_with_b(a: OrderedDict, b: OrderedDict) -> OrderedDict:
+        # recursively process all documents
+        if 'documents' in a and 'documents' in b:
+            new_json = OrderedDict(a)
+            for d_id in set(a['documents'].keys()) | set(b['documents'].keys()):
+                if d_id in a['documents'] and d_id in b['documents']:
+                    new_json['documents'][d_id] = Unifier.extend_a_with_b(a['documents'][d_id],
+                                                                          b['documents'][d_id])
+            return new_json
+
         new_doc = OrderedDict(a)
         from_doc = OrderedDict(b)
         token_shift = len(a['tokenList'])
