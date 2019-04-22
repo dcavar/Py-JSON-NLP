@@ -62,7 +62,13 @@ To convert the other direction:
             return OrderedDict()
             
 The provided keyword arguments should be used to toggle on or off processing components within the method.        
+            
+If you have deployed a `Pipeline` as a microservice (see below), we provide a local endpoint for a remotely 
+deployed `Pipeline` via the `RemotePipeline` class:
 
+    pipeline = pyjsonnlp.pipeline.RemotePipeline('localhost', port=9000)
+    print(pipeline.process(text='I am a sentence', dependencies=True, something='else'), spacing=2)
+            
 ## Microservice
 
 The next step is the [JSON-NLP] a Microservice class, with a pre-built implementation of [Flask]. 
