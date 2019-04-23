@@ -78,15 +78,8 @@ class Unifier(object):
         if annotation == 'expressions':
             new_doc['expressions'] = from_doc.get('expressions', [])
         elif annotation == 'tokens':
-            for t_a, t_b in zip(new_doc.get('tokenList', {}).values(), from_doc.get('tokenList', {}).values()):
-                for k, v in t_b.items():
-                    if k not in t_a:
-                        t_a[k] = v
-                    elif isinstance(v, dict):
-                        for kk, vv in v.items():
-                            t_a[k][kk] = vv
-                    else:
-                        t_a[k] = v
+            for ta_id, t_a in new_doc.get('tokenList', {}).items():
+                Unifier._merge_b_into_a(a=t_a, b=from_doc['tokenList'][ta_id], prioritize_a=False)
         else:
             raise UnificationError("Only 'coreferences', 'tokens', and 'expressions' are currently supported!")
 
@@ -110,14 +103,8 @@ class Unifier(object):
             new_doc['coreferences'] = Unifier.merge_coreferences(new_doc.get('coreferences', []),
                                                                  from_doc.get('coreferences', []))
         elif annotation == 'tokens':
-            for t_a, t_b in zip(new_doc.get('tokenList', {}).values(), from_doc.get('tokenList', {}).values()):
-                for k, v in t_b.items():
-                    if k not in t_a:
-                        t_a[k] = v
-                    elif isinstance(v, dict):
-                        for kk, vv in v.items():
-                            if kk not in t_a[k]:
-                                t_a[k][kk] = vv
+            for ta_id, t_a in new_doc.get('tokenList', {}).items():
+                Unifier._merge_b_into_a(a=t_a, b=from_doc['tokenList'][ta_id], prioritize_a=True)
         elif annotation == 'expressions':
             for expr in from_doc.get('expressions', []):
                 expr_shift = len(a.get('expressions', []))
@@ -129,6 +116,17 @@ class Unifier(object):
             raise UnificationError("Only 'coreferences', 'tokens', and 'expressions' are currently supported!")
 
         return new_doc
+
+    @staticmethod
+    def _merge_b_into_a(a: dict, b: dict, prioritize_a=True) -> None:
+        """Recursively merge dict b into dict a, optionally prioritizing dict a's values"""
+        for k, v in b.items():
+            if k not in a:
+                a[k] = v
+            elif isinstance(v, dict):
+                Unifier._merge_b_into_a(a[k], b[k])
+            elif not prioritize_a:
+                a[k] = v
 
     @staticmethod
     def extend_a_with_b(a: OrderedDict, b: OrderedDict) -> OrderedDict:
