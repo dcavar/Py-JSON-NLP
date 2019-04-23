@@ -664,10 +664,10 @@
                   ]
                 },
                 "synsets": {
-                  "$id": "#/properties/documents/tokenList/items/properties/synsets",
-                  "type": "array",
-                  "items": {
+                  "type": "object",
+                  "additionalProperties": {
                     "type": "object",
+                    "required": ["wordnetId"],
                     "additionalProperties": false,
                     "properties": {
                       "scores": {
@@ -718,6 +718,35 @@
                         }
                       },
                       "definition": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "verbFrames": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "required": ["classId"],
+                    "additionalProperties": true,
+                    "properties": {
+                      "classId": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "frames": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "required": ["name", "frameId"],
+                    "additionalProperties": true,
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "frameId": {
                         "type": "string"
                       }
                     }
