@@ -105,6 +105,7 @@ class DependencyAnnotator(Annotator):
                                 matrix = self.build_clause(c_id, s_id, 'matrix', matrix_tokens)
                                 doc['clauses'][c_id] = matrix
                                 self.annotate_item(d, s_head, matrix)
+                                c_id += 1
 
                             depth += 1
                             item = clause
