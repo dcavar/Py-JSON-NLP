@@ -389,6 +389,22 @@
                     }
                   }
                 },
+                "tense": {
+                  "type": "string",
+                  "pattern": "^(past|present|future|past-perfect|future-perfect)$"
+                },
+                "transitivity": {
+                  "type": "string",
+                  "pattern": "^(transitive|intransitive|ditransitive)$"
+                },
+                "negated": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "root": {
+                  "description": "Token id corresponding to the root",
+                  "type": "integer"
+                },
                 "mainVerb": {
                   "type": "array",
                   "description": "Token Ids corresponding to the main verb",
@@ -479,6 +495,14 @@
                 "sentenceId": {
                   "type": "integer",
                   "description": "Reference to the containing sentence"
+                },
+                "parentClauseId": {
+                  "type": "integer",
+                  "description": "Reference to the containing clause"
+                },
+                "tense": {
+                  "type": "string",
+                  "pattern": "^(past|present|future|past-perfect|future-perfect)$"
                 },
                 "type": {
                   "type": "string",

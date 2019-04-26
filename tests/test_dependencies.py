@@ -1,17 +1,17 @@
 from collections import OrderedDict
 from unittest import TestCase
 
-from pyjsonnlp.dependencies import UniversalDependencyParse
+from pyjsonnlp.dependencies import UniversalDependencyParse, DependencyAnnotator
 from pyjsonnlp.tokenization import surface_string
 
-j = {
+j = OrderedDict({
   "meta": {
     "DC.conformsTo": "0.2.9",
     "DC.created": "2019-04-25T20:31:28",
     "DC.date": "2019-04-25T20:31:28"
   },
   "documents": {
-    "1": {
+    1: {
       "meta": {
         "DC.conformsTo": "0.2.9",
         "DC.source": "SpaCy 2.1.3",
@@ -21,8 +21,8 @@ j = {
       },
       "id": 1,
       "text": "I want to buy a big red car.",
-      "tokenList": {
-        "1": {
+      "tokenList": OrderedDict({
+        1: {
           "id": 1,
           "text": "I",
           "lemma": "-PRON-",
@@ -44,7 +44,7 @@ j = {
           },
           "shape": "X"
         },
-        "2": {
+        2: {
           "id": 2,
           "text": "want",
           "lemma": "want",
@@ -67,7 +67,7 @@ j = {
           },
           "shape": "xxxx"
         },
-        "3": {
+        3: {
           "id": 3,
           "text": "to",
           "lemma": "to",
@@ -90,7 +90,7 @@ j = {
           },
           "shape": "xx"
         },
-        "4": {
+        4: {
           "id": 4,
           "text": "buy",
           "lemma": "buy",
@@ -112,7 +112,7 @@ j = {
           },
           "shape": "xxx"
         },
-        "5": {
+        5: {
           "id": 5,
           "text": "a",
           "lemma": "a",
@@ -133,7 +133,7 @@ j = {
           },
           "shape": "x"
         },
-        "6": {
+        6: {
           "id": 6,
           "text": "big",
           "lemma": "big",
@@ -155,7 +155,7 @@ j = {
           },
           "shape": "xxx"
         },
-        "7": {
+        7: {
           "id": 7,
           "text": "red",
           "lemma": "red",
@@ -177,7 +177,7 @@ j = {
           },
           "shape": "xxx"
         },
-        "8": {
+        8: {
           "id": 8,
           "text": "car",
           "lemma": "car",
@@ -199,7 +199,7 @@ j = {
           },
           "shape": "xxx"
         },
-        "9": {
+        9: {
           "id": 9,
           "text": ".",
           "lemma": ".",
@@ -220,9 +220,9 @@ j = {
             "SpaceAfter": "No"
           }
         }
-      },
+      }),
       "sentences": {
-        "1": {
+        1: {
           "id": 1,
           "tokenFrom": 1,
           "tokenTo": 10,
@@ -243,7 +243,7 @@ j = {
         {
           "style": "universal",
           "arcs": {
-            "1": [
+            1: [
               {
                 "sentenceId": 1,
                 "label": "nsubj",
@@ -251,7 +251,7 @@ j = {
                 "dependent": 1
               }
             ],
-            "2": [
+            2: [
               {
                 "sentenceId": 1,
                 "label": "root",
@@ -259,7 +259,7 @@ j = {
                 "dependent": 2
               }
             ],
-            "3": [
+            3: [
               {
                 "sentenceId": 1,
                 "label": "aux",
@@ -267,7 +267,7 @@ j = {
                 "dependent": 3
               }
             ],
-            "4": [
+            4: [
               {
                 "sentenceId": 1,
                 "label": "xcomp",
@@ -275,7 +275,7 @@ j = {
                 "dependent": 4
               }
             ],
-            "5": [
+            5: [
               {
                 "sentenceId": 1,
                 "label": "det",
@@ -283,7 +283,7 @@ j = {
                 "dependent": 5
               }
             ],
-            "6": [
+            6: [
               {
                 "sentenceId": 1,
                 "label": "amod",
@@ -291,7 +291,7 @@ j = {
                 "dependent": 6
               }
             ],
-            "7": [
+            7: [
               {
                 "sentenceId": 1,
                 "label": "amod",
@@ -299,7 +299,7 @@ j = {
                 "dependent": 7
               }
             ],
-            "8": [
+            8: [
               {
                 "sentenceId": 1,
                 "label": "dobj",
@@ -307,7 +307,7 @@ j = {
                 "dependent": 8
               }
             ],
-            "9": [
+            9: [
               {
                 "sentenceId": 1,
                 "label": "punct",
@@ -340,15 +340,12 @@ j = {
       ]
     }
   }
-}
+})
 
 
 class TestUniversalDependencies(TestCase):
     def setUp(self) -> None:
-        self.tokens = OrderedDict((t['id'], t) for t in j['documents']['1']['tokenList'].values())
-        deps = j['documents']['1']['dependencies'][0]
-        deps['arcs'] = dict((int(k), v) for k, v in j['documents']['1']['dependencies'][0]['arcs'].items())
-        self.d = UniversalDependencyParse(deps, self.tokens)
+        self.d = UniversalDependencyParse(j['documents'][1]['dependencies'][0], j['documents'][1]['tokenList'])
 
     def test_get_leaves_all(self):
         actual = surface_string(self.d.get_leaves(2))
@@ -366,32 +363,25 @@ class TestUniversalDependencies(TestCase):
         assert expected == actual, actual
 
     def test_get_leaves_by_arc_xcomp(self):
-        arcs = self.d.get_leaves_by_arc('xcomp')
-        assert 4 in arcs
-        assert 1 == len(arcs), len(arcs)
-        actual = surface_string(arcs[4])
+        head, arcs = self.d.get_leaves_by_arc('xcomp')
+        actual = surface_string(arcs)
         expected = 'to buy a big red car'
         assert expected == actual, actual
+        assert 4 == head, head
 
     def test_get_leaves_by_arc_dobj(self):
-        arcs = self.d.get_leaves_by_arc('dobj')
-        assert 8 in arcs
-        assert 1 == len(arcs), len(arcs)
-        actual = surface_string(arcs[8])
+        head, arcs = self.d.get_leaves_by_arc('dobj')
+        actual = surface_string(arcs)
         expected = 'a big red car'
         assert expected == actual, actual
+        assert 8 == head, head
 
     def test_get_leaves_by_arc_amod(self):
-        arcs = self.d.get_leaves_by_arc('amod')
-        assert 6 in arcs
-        assert 7 in arcs
-        assert 2 == len(arcs)
-        actual = surface_string(arcs[6], trim=True)
-        expected = 'big'
-        assert expected == actual, actual
-        actual = surface_string(arcs[7], trim=True)
+        head, arcs = self.d.get_leaves_by_arc('amod')
+        actual = surface_string(arcs, trim=True)
         expected = 'red'
         assert expected == actual, actual
+        assert 7 == head, head
 
     def test_is_arc_present_below(self):
         assert self.d.is_arc_present_below(2, 'xcomp')
@@ -401,3 +391,48 @@ class TestUniversalDependencies(TestCase):
     def test_get_child_with_arc(self):
         assert 1 == self.d.get_child_with_arc(2, 'nsubj')
         assert not self.d.get_child_with_arc(2, 'fake')
+        
+
+class TestDependencyAnnotator(TestCase):
+    def setUp(self) -> None:
+        self.d = DependencyAnnotator()
+
+    def test_annotate(self):
+        nlp_json = OrderedDict(j)
+        self.d.annotate(nlp_json)
+        sent = nlp_json['documents'][1]['sentences'][1]
+        assert [2] == sent['root'], sent['root']
+        assert [2] == sent['mainVerb'], sent['mainVerb']
+        assert 1 == sent['subject'], sent['subject']
+        assert not sent['compound']
+        assert sent['complex']
+        assert not sent['negated']
+
+        expected = {
+          1: {
+            'id': 1,
+            'sentenceId': 1,
+            'clauseType': 'relative',
+            'tokens': [3, 4, 5, 6, 7, 8],
+            'root': [4],
+            'mainVerb': [4],
+            'compound': False,
+            'complex': False,
+            'negated': False,
+            'parentClauseId': 2
+          },
+          2: {
+            'id': 2,
+            'sentenceId': 1,
+            'clauseType': 'matrix',
+            'tokens': [1, 2, 9],
+            'root': [2],
+            'mainVerb': [2],
+            'subject': 1,
+            'compound': False,
+            'complex': True,
+            'negated': False
+          }
+        }
+        actual = nlp_json['documents'][1]['clauses']
+        assert expected == actual, actual
