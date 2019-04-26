@@ -410,6 +410,13 @@
                     "type": "integer"
                   }
                 },
+                "indirectObject": {
+                  "type": "array",
+                  "description": "Token Ids corresponding to the indirect object",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
                 "tokenFrom": {
                   "type": "integer",
                   "description": "Start token, inclusive"
@@ -421,14 +428,6 @@
                 "tokens": {
                   "$ref": "#/definitions/tokenIdList"
                 },
-                "clauses": {
-                  "type": "array",
-                  "minItems": 1,
-                  "uniqueItems": true,
-                  "items": {
-                    "type": "integer"
-                  }
-                },
                 "labels": {
                   "$ref": "#/definitions/labels"
                 },
@@ -436,11 +435,16 @@
                   "type": "boolean",
                   "default": false
                 },
+                "compound": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "fragment": {
+                  "type": "boolean",
+                  "default": false
+                },
                 "type": {
                   "type": "string",
-                  "examples": [
-                    "interrogative"
-                  ],
                   "pattern": "^(interrogative|alternative_question|declarative_question|direct_question|indirect_question|display_question|echo_question|embedded_question|hypophora|leading_question|declarative|rhetorical_question|tag_question|wh_question|whimperative|yes_no_question)$"
                 },
                 "embeddings": {
@@ -464,7 +468,6 @@
                 "id",
                 "sentenceId",
                 "type",
-                "mainVerb",
                 "root",
                 "tokens"
               ],
@@ -479,20 +482,10 @@
                 },
                 "type": {
                   "type": "string",
-                  "examples": [
-                    "matrix",
-                    "complement",
-                    "adjunct"
-                  ],
-                  "pattern": "^(matrix|complement|adjunct|relative)$"
+                  "pattern": "^(matrix|complement|relative|adverbial|adjectival|subject)$"
                 },
                 "transitivity": {
                   "type": "string",
-                  "examples": [
-                    "transitive",
-                    "intransitive",
-                    "ditransitive"
-                  ],
                   "pattern": "^(transitive|intransitive|ditransitive)$"
                 },
                 "negated": {
@@ -516,6 +509,13 @@
                 "object": {
                   "type": "array",
                   "description": "Token Ids corresponding to the object",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                "indirectObject": {
+                  "type": "array",
+                  "description": "Token Ids corresponding to the indirect object",
                   "items": {
                     "type": "integer"
                   }
@@ -809,6 +809,7 @@
                     "items": {
                       "type": "object",
                       "required": [
+                        "sentenceId",
                         "label",
                         "governor"
                       ],

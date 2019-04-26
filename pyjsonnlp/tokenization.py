@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from typing import List
 
 import syntok.segmenter as segmenter
@@ -30,3 +31,14 @@ def segment(text: str) -> List[List[ConllToken]]:
                     sent[-2].space_after = sent[-1].spacing == ' '
 
     return sentences
+
+
+def surface_string(tokens: List[OrderedDict], trim=False) -> str:
+    s = ''.join([t['text'] + (' ' if t.get('misc', {}).get('SpaceAfter', 'No') == 'Yes' else '')
+                for t in tokens])
+    return s.rstrip() if trim else s
+
+
+def subtract_tokens(a: List[OrderedDict], b: List[OrderedDict]) -> List[OrderedDict]:
+    b_set = set(map(lambda t: t['id'], b))
+    return [t for t in a if t['id'] not in b_set]
