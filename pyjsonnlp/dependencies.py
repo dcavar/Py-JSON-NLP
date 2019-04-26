@@ -1,10 +1,29 @@
 from collections import OrderedDict
 from typing import List, Union, Tuple
 
+from pyjsonnlp.annotation import Annotator
 from pyjsonnlp.tokenization import subtract_tokens
 
 
-class UniversalDependencyParse:
+class DependencyParse:
+    def is_arc_present_below(self, token_id: int, arc: str) -> bool:
+        raise NotImplementedError
+
+    @property
+    def style(self) -> str:
+        raise NotImplementedError
+
+    def get_leaves(self, token_id: int) -> List[OrderedDict]:
+        raise NotImplementedError
+
+    def get_leaves_by_arc(self, arc: str, head=None, sentence_id=1) -> Tuple[int, List[OrderedDict]]:
+        raise NotImplementedError
+
+    def get_child_with_arc(self, token_id: int, arc: str) -> Union[None, OrderedDict]:
+        raise NotImplementedError
+
+
+class UniversalDependencyParse(DependencyParse):
     def __init__(self, dependencies: dict, tokens: OrderedDict):
         self.deps = dependencies
         self.tokens = tokens
@@ -62,11 +81,6 @@ class UniversalDependencyParse:
             if label == arc:
                 return dep
         return None
-
-
-class Annotator:
-    def annotate(self, nlp_json: OrderedDict) -> None:
-        pass
 
 
 class DependencyAnnotator(Annotator):
@@ -162,8 +176,3 @@ class DependencyAnnotator(Annotator):
         # todo sentence types
         # todo tense
         # todo modality
-
-
-class Relations:
-    def extract(self) -> None:
-        pass

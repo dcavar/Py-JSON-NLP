@@ -478,7 +478,7 @@
           "clauses": {
             "$id": "#/properties/documents/clauses",
             "type": "object",
-            "additionalItems": {
+            "additionalProperties": {
               "type": "object",
               "required": [
                 "id",
@@ -1071,6 +1071,31 @@
                 },
                 "scores": {
                   "$ref": "#/definitions/scores"
+                }
+              }
+            }
+          },
+          "relations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "required": ["id", "predicate", "from", "to"],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "predicate": {
+                  "$ref": "#/definitions/tokenIdList"
+                },
+                "from": {
+                  "$ref": "#/definitions/tokenIdList"
+                },
+                "to": {
+                  "$ref": "#/definitions/tokenIdList"
+                },
+                "modality": {
+                  "$ref": "#/definitions/tokenIdList"                  }
                 }
               }
             }
