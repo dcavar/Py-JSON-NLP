@@ -177,10 +177,13 @@ class DependencyAnnotator(Annotator):
             v, rel = d.get_child_with_arc(head, arc)
             if v:
                 #if there is a new subj or obj, start the recursion.
-                #Here, both the head and current node is head.
+                #Here, both the head_token and node_token is head.
                 self.build_compound_concepts(d,head,head,item)
                 item[k] = v
 
+        # Getting the right sequence of tokens
+        item[head]['comp_subj'] = sorted(item[head]['comp_subj'])
+        item[head]['subj_phrase'] = sorted(item[head]['subj_phrase'])
         # compound/complex/fragment
         item['compound'] = any(map(lambda a: d.is_arc_present_below(head, a), self.compound_arcs))
         item['complex'] = any(map(lambda a: d.is_arc_present_below(head, a), self.clause_arcs))
