@@ -181,9 +181,13 @@ class DependencyAnnotator(Annotator):
                 self.build_compound_concepts(d,head,head,item)
                 item[k] = v
 
+        # Adding the compound subject to the phrase
+        item[head]['subj_phrase'] += item[head]['comp_subj']
+        
         # Getting the right sequence of tokens
         item[head]['comp_subj'] = sorted(item[head]['comp_subj'])
         item[head]['subj_phrase'] = sorted(item[head]['subj_phrase'])
+        
         # compound/complex/fragment
         item['compound'] = any(map(lambda a: d.is_arc_present_below(head, a), self.compound_arcs))
         item['complex'] = any(map(lambda a: d.is_arc_present_below(head, a), self.clause_arcs))
