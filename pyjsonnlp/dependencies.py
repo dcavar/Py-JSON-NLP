@@ -156,7 +156,7 @@ class DependencyAnnotator(Annotator):
         # A DFS method where I check all the relation for the node_token.
         # Store it in a list. Pop the first relation and do a while loop 
         # till the list becomes empty. It does this at every depth.
-        relations = get_token_dependencies(node_token)
+        relations = d.get_token_dependencies(node_token)
         while(len(relations)>0):
             tok, rel = relations.pop()
             if relation == 'compound':
