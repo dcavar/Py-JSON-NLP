@@ -152,10 +152,10 @@ class DependencyAnnotator(Annotator):
 
     def build_compound_concepts(self, d: UniversalDependencyParse, head_token: int, node_token: int, item):
         # head_token: Token from which the recursion starts
-        # node_token: Token at which the current recursion checks
+        # node_token: Token, which the current recursion checks
         # A DFS method where I check all the relation for the node_token.
         # Store it in a list. Pop the first relation and do a while loop 
-        # till the list becomes empty. It does this at every depth. 
+        # till the list becomes empty. It does this at every depth.
         relations = get_token_dependencies(node_token)
         while(len(relations)>0):
             tok, rel = relations.pop()
@@ -169,7 +169,7 @@ class DependencyAnnotator(Annotator):
     def annotate_item(self, d: UniversalDependencyParse, head: int, item: dict) -> None:
         # root
         item['root'] = [head]
-        item['head'] = {}
+        item['head'] = {'comp_subj':[],'subj_phrase':[]}
         # subject/object/verb
         if d.tokens[head]['upos'] == 'VERB':
             item['mainVerb'] = [head]
