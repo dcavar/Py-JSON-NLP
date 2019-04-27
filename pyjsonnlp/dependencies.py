@@ -79,8 +79,14 @@ class UniversalDependencyParse(DependencyParse):
     def get_child_with_arc(self, token_id: int, arc: str) -> Union[None, OrderedDict]:
         for dep, label in self.nodes.get(token_id, []):
             if label == arc:
-                return dep
+                return dep,label
         return None
+
+    def get_token_dependencies(self, token_id: int)
+        if token_id in self.nodes.keys():
+            return self.nodes.get(token_id, [])
+        else:
+            return None
 
 
 class DependencyAnnotator(Annotator):
@@ -144,16 +150,35 @@ class DependencyAnnotator(Annotator):
             clause['parentClauseId'] = parent_clause_id
         return clause
 
+    def build_compound_concepts(self, d: UniversalDependencyParse, head_token: int, node_token: int, item):
+        # head_token: Token from which the recursion starts
+        # node_token: Token at which the current recursion checks
+        # A DFS method where I check all the relation for the node_token.
+        # Store it in a list. Pop the first relation and do a while loop 
+        # till the list becomes empty. It does this at every depth. 
+        relations = get_token_dependencies(node_token)
+        while(len(relations)>0):
+            tok, rel = relations.pop()
+            if relation == 'compound':
+                item[head_token]['comp_subj'].append(tok)
+            if relation in ['amod','DT']:
+                item[head_token]['subj_phrase'].append(tok)
+            build_compound_concepts(d,head_token,tok,item)
+
+
     def annotate_item(self, d: UniversalDependencyParse, head: int, item: dict) -> None:
         # root
         item['root'] = [head]
-
+        item['head'] = {}
         # subject/object/verb
         if d.tokens[head]['upos'] == 'VERB':
             item['mainVerb'] = [head]
         for k, arc in (('subject', 'nsubj'), ('object', 'obj'), ('indirectObject', 'iobj'), ('indirectObject', 'dative')):
-            v = d.get_child_with_arc(head, arc)
+            v, rel = d.get_child_with_arc(head, arc)
             if v:
+                #if there is a new subj or obj, start the recursion.
+                #Here, both the head and current node is head.
+                self.build_compound_concepts(d,head,head,item)
                 item[k] = v
 
         # compound/complex/fragment
