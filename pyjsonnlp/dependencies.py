@@ -161,7 +161,7 @@ class DependencyAnnotator(Annotator):
             tok, rel = relations.pop()
             if relation == 'compound':
                 item[head_token]['comp_subj'].append(tok)
-            if relation in ['amod','DT']:
+            else:
                 item[head_token]['subj_phrase'].append(tok)
             build_compound_concepts(d,head_token,tok,item)
 
