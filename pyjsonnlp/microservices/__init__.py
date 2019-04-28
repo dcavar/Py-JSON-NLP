@@ -32,6 +32,7 @@ class Microservice(object):
         self.__with_coref = False
         self.__with_constituents = False
         self.__with_expressions = False
+        self.__with_process_conll = False
 
     @property
     def with_coreferences(self):
@@ -64,6 +65,14 @@ class Microservice(object):
     @with_dependencies.setter
     def with_dependencies(self, value):
         self.__with_deps = bool(value)
+
+    @property
+    def with_conll(self):
+        return self.__with_process_conll
+
+    @with_conll.setter
+    def with_conll(self, value):
+        self.__with_process_conll = bool(value)
 
     def check_output_format(self, output_format: str) -> str:
         """Clean up output format, check if it is valid before returning the normalized string"""
@@ -117,8 +126,11 @@ class Microservice(object):
     def handle_error(self, error: Exception):
         raise NotImplementedError
 
-    def run_pipeline(self, style: Process) -> OrderedDict:
-        params = self.get_args()
+    def make_pipeline_args(self, style=Process.FULL) -> dict:
+        # start with base params
+        args = self.get_args()
+        params = dict(args)
+        # add process-specific params
         if style == Process.FULL:
             params['dependencies'] = True
             params['constituents'] = True
@@ -129,8 +141,18 @@ class Microservice(object):
             params['constituents'] = style == Process.CONST
             params['coreferences'] = style == Process.COREF
             params['expressions'] = style == Process.EXPR
+        # allow for overrides of defaults
+        params.update(args)
+        # add text
         params['text'] = self.get_text()
 
+        print(args)
+        print(params)
+
+        return params
+
+    def run_pipeline(self, style: Process) -> OrderedDict:
+        params = self.make_pipeline_args(style)
         return self.pipeline.process(**params)
 
     def process(self):
@@ -174,5 +196,12 @@ class Microservice(object):
             if not self.with_expressions:
                 raise BrokenPipeError('This pipeline does not have an expressions parser')
             return self.write_output(self.run_pipeline(Process.EXPR))
+        except Exception as e:
+            return self.handle_error(e)
+
+    def custom_process(self, f):
+        try:
+            params = self.make_pipeline_args()
+            return self.write_output(f(**params))
         except Exception as e:
             return self.handle_error(e)

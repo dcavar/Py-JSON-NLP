@@ -58,6 +58,9 @@ class TestMicroservice(TestCase):
         assert not self.ms.with_coreferences
         assert self.ms.with_dependencies
 
+    def test_run_pipeline(self):
+        pass
+
     # def test_allowed_file(self):
     #     self.ms.allowed_extensions = {'txt'}
     #     assert True is self.ms.allowed_file('/tmp/somefile.txt')
@@ -107,9 +110,6 @@ class TestMicroservice(TestCase):
         pass
 
     def test_handle_error(self):
-        pass
-
-    def test_run_pipeline(self):
         pass
 
     def test_process(self):

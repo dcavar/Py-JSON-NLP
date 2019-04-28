@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pyjsonnlp",
-    version='0.2.10',
+    version='0.2.11',
     python_requires='>=3.6',
     author="Damir Cavar, Oren Baldinger, Maanvitha Gongalla, Anurag Kumar, Murali Kammili",
     author_email="damir@cavar.me",
@@ -21,7 +21,8 @@ setuptools.setup(
         'flask',
         'iso639',
         'bs4',
-        'syntok>=1.1.1'
+        'syntok>=1.1.1',
+        'aioify>=0.3.1'
     ],
     classifiers=[
         "Programming Language :: Python :: 3.6",

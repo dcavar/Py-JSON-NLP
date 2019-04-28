@@ -16,12 +16,12 @@ class FlaskMicroservice(Microservice, Flask):
         Microservice.__init__(self, pipeline, base_route)
         Flask.__init__(self, import_name)
 
-        self.add_url_rule(base_route, view_func=self.process)
-        self.add_url_rule(base_route + 'dependencies', view_func=self.dependencies)
-        self.add_url_rule(base_route + 'constituents', view_func=self.constituents)
-        self.add_url_rule(base_route + 'token_list', view_func=self.token_list)
-        self.add_url_rule(base_route + 'coreferences', view_func=self.coreferences)
-        self.add_url_rule(base_route + 'expressions', view_func=self.expressions)
+        self.add_url_rule(base_route, view_func=self.process, methods=['GET', 'POST'])
+        self.add_url_rule(base_route + 'dependencies', view_func=self.dependencies, methods=['GET', 'POST'])
+        self.add_url_rule(base_route + 'constituents', view_func=self.constituents, methods=['GET', 'POST'])
+        self.add_url_rule(base_route + 'token_list', view_func=self.token_list, methods=['GET', 'POST'])
+        self.add_url_rule(base_route + 'coreferences', view_func=self.coreferences, methods=['GET', 'POST'])
+        self.add_url_rule(base_route + 'expressions', view_func=self.expressions, methods=['GET', 'POST'])
 
     def write_text(self, conll: str):
         """Write CONLLU format to the response."""
@@ -38,7 +38,8 @@ class FlaskMicroservice(Microservice, Flask):
                 return self.scrape_website(request.args.get('url'))
             if request.args.get('text'):
                 return request.args.get('text')
-            raise NotImplementedError('You need to provide data to parse!')  # todo redirect to help page
+            if 'conll' not in request.url:
+                raise NotImplementedError('You need to provide data to parse!')  # todo redirect to help page
         if request.is_json:
             data = request.get_json()
             if 'text' not in data:
@@ -49,7 +50,10 @@ class FlaskMicroservice(Microservice, Flask):
         if 'url' in request.form:
             return self.scrape_website(request.form['url'])
 
-        raise NotImplementedError('You need to provide data to parse!')
+        if 'conll' not in request.url:
+            raise NotImplementedError('You need to provide data to parse!')
+
+        return ''
 
     def write_json(self, j: OrderedDict):
         """Preserves the order of the json object"""
@@ -62,7 +66,23 @@ class FlaskMicroservice(Microservice, Flask):
         return request.args.get('format', 'jsonnlp')
 
     def get_args(self) -> dict:
-        return dict(request.args)
+        def map_value(key, val):
+            if isinstance(val, str):
+                lower_case = val.lower()
+                if lower_case == 'true' or lower_case == 'yes':
+                    return True
+                elif lower_case == 'false' or lower_case == 'no':
+                    return False
+            if key in {'constituents', 'dependencies', 'token_list', 'coreferences', 'expressions'}:
+                return val == 1
+            return val
+
+        # we want to include GET and POST parameters
+        args = dict((k, map_value(k, v)) for k, v in request.args.items())
+        for k, v in request.form.items():
+            args[k] = map_value(k, v)
+
+        return args
 
     def debug(self):
         self.run(debug=True)

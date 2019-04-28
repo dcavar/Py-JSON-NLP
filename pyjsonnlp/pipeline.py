@@ -16,6 +16,10 @@ class Pipeline(object):
     def process(text='', coreferences=False, constituents=False, dependencies=False, expressions=False, **kwargs) -> OrderedDict:
         raise NotImplementedError
 
+    def process_conll(self, conll='', coreferences=False, constituents=False, dependencies=False, expressions=False,
+                      **kwargs):
+        pass
+
 
 class RemotePipeline(Pipeline):
     """This class providers a local endpoint for a Pipeline deployed remotely as a microservice"""
@@ -34,14 +38,54 @@ class RemotePipeline(Pipeline):
                 **kwargs) -> OrderedDict:
         params = {
             'text': text,
-            'coreferences': int(coreferences),
-            'constituents': int(constituents),
-            'dependencies': int(dependencies),
-            'expressions': int(expressions)
+            'coreferences': coreferences,
+            'constituents': constituents,
+            'dependencies': dependencies,
+            'expressions': expressions
         }
         params.update(kwargs)
         r = requests.post(self.url, data=params)
         if r.status_code != 200 and r.status_code != 201:
             raise BrokenPipeError(f'{r.reason} from {self.url} ({r.status_code})')
 
-        return OrderedDict(r.json())
+        return RemotePipeline.to_python(r.json())
+
+    def process_conll(self, conll='', coreferences=False, constituents=False, dependencies=False, expressions=False,
+                      **kwargs):
+        if conll == '':
+            raise ValueError('You must pass something in the conll parameter!')
+
+        params = {
+            'conll': conll,
+            'coreferences': coreferences,
+            'constituents': constituents,
+            'dependencies': dependencies,
+            'expressions': expressions
+        }
+        params.update(kwargs)
+
+        url = self.url + '/process_conll'
+        r = requests.post(url, data=params)
+        if r.status_code != 200 and r.status_code != 201:
+            raise BrokenPipeError(f'{r.reason} from {url} ({r.status_code})')
+
+        return RemotePipeline.to_python(r.json())
+
+    @staticmethod
+    def to_python(json_data: dict) -> OrderedDict:
+        """Convert sting dict keys to integer"""
+        corrected = OrderedDict()
+
+        for key, value in json_data.items():
+            if isinstance(value, list):
+                value = [RemotePipeline.to_python(item) if isinstance(item, dict) else item
+                         for item in value]
+            elif isinstance(value, dict):
+                value = RemotePipeline.to_python(value)
+            try:
+                key = int(key)
+            except Exception:
+                pass
+            corrected[key] = value
+
+        return corrected
