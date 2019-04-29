@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from unittest import TestCase
 
-from pyjsonnlp.dependencies import UniversalDependencyParse, DependencyAnnotator
+from pyjsonnlp.dependencies import UniversalDependencyParse
 from pyjsonnlp.tokenization import surface_string
 
 j = OrderedDict({
@@ -395,23 +395,4 @@ class TestUniversalDependencies(TestCase):
         assert not self.d.get_child_with_arc(2, 'fake')
         
 
-class TestDependencyAnnotator(TestCase):
-    def setUp(self) -> None:
-        self.d = DependencyAnnotator()
 
-    def test_annotate(self):
-        nlp_json = OrderedDict(j)
-        self.d.annotate(nlp_json)
-        sent = nlp_json['documents'][1]['sentences'][1]
-        assert [2] == sent['root'], sent['root']
-        expected = {'head': 2, 'semantic': [2], 'phrase': [1, 2, 3, 4, 5, 6, 7, 8, 9]}
-        assert expected == sent['mainVerb'], sent['mainVerb']
-        expected = {'head': 1, 'semantic': [1], 'phrase': [1]}
-        assert expected == sent['subject'], sent['subject']
-        assert not sent['compound']
-        assert sent['complex']
-        assert not sent['negated']
-
-        expected = {1: {'id': 1, 'sentenceId': 1, 'clauseType': 'relative', 'tokens': [3, 4, 5, 6, 7, 8], 'root': [4], 'mainVerb': {'head': 4, 'semantic': [4], 'phrase': [3, 4, 5, 6, 7, 8]}, 'object': {'head': 8, 'semantic': [8], 'phrase': [5, 6, 7, 8]}, 'compound': False, 'complex': False, 'transitivity': 'transitive', 'negated': False, 'parentClauseId': 2}, 2: {'id': 2, 'sentenceId': 1, 'clauseType': 'matrix', 'tokens': [1, 2, 9], 'root': [2], 'mainVerb': {'head': 2, 'semantic': [2], 'phrase': [1, 2, 3, 4, 5, 6, 7, 8, 9]}, 'subject': {'head': 1, 'semantic': [1], 'phrase': [1]}, 'compound': False, 'complex': True, 'negated': False}}
-        actual = nlp_json['documents'][1]['clauses']
-        assert expected == actual, actual

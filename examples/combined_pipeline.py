@@ -7,7 +7,7 @@ from aioify import aioify
 
 from pyjsonnlp.annotation.relations import RelationAnnotator
 from pyjsonnlp.conversion import to_conllu
-from pyjsonnlp.dependencies import DependencyAnnotator
+# from pyjsonnlp.dependencies import DependencyAnnotator
 from pyjsonnlp.pipeline import Pipeline, RemotePipeline
 from pyjsonnlp.unification import Unifier
 
@@ -68,11 +68,11 @@ class UnifiedRemotePipeline(Pipeline):
         # add nltk *nets
         unified = unifier.add_annotation_to_a_from_b(a=unified, b=self.nltk_json, annotation='tokens')
 
-        clause_annotator = DependencyAnnotator()
+        # clause_annotator = DependencyAnnotator()
         relation_extractor = RelationAnnotator()
         # linker = RelationLinker()
 
-        clause_annotator.annotate(unified)
+        # clause_annotator.annotate(unified)
         relation_extractor.annotate(unified)
         # linker.annotate(unified)
 
