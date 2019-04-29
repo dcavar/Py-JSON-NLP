@@ -98,5 +98,5 @@ class LocalUnifiedRemotePipeline(UnifiedRemotePipeline):
 if __name__ == "__main__":
     test_text = "The Mueller Report is a very long report. We spent a long time analyzing it. Trump wishes we didn't, but that didn't stop the intrepid NlpLab."
     pipeline = LocalUnifiedRemotePipeline()
-    j = pipeline.process(text=test_text)
-    print(json.dumps(j, indent=2))
+    j = pipeline.process(text="John likes New York City. Mary doesn't like it.")
+    print(json.dumps(j['documents'][1], indent=2))

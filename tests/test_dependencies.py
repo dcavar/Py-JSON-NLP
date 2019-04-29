@@ -389,7 +389,9 @@ class TestUniversalDependencies(TestCase):
         assert not self.d.is_arc_present_below(4, 'xcomp')
 
     def test_get_child_with_arc(self):
-        assert 1 == self.d.get_child_with_arc(2, 'nsubj')
+        actual = self.d.get_child_with_arc(2, 'nsubj')
+        expected = {'id': 1, 'text': 'I', 'lemma': '-PRON-', 'xpos': 'PRP', 'upos': 'PRON', 'entity_iob': 'O', 'characterOffsetBegin': 0, 'characterOffsetEnd': 1, 'lang': 'en', 'features': {'Overt': 'Yes', 'Stop': 'Yes', 'Alpha': 'Yes', 'PronType': 'Prs', 'Foreign': 'No'}, 'misc': {'SpaceAfter': 'Yes'}, 'shape': 'X'}
+        assert expected == actual, actual
         assert not self.d.get_child_with_arc(2, 'fake')
         
 
@@ -402,37 +404,14 @@ class TestDependencyAnnotator(TestCase):
         self.d.annotate(nlp_json)
         sent = nlp_json['documents'][1]['sentences'][1]
         assert [2] == sent['root'], sent['root']
-        assert [2] == sent['mainVerb'], sent['mainVerb']
-        assert 1 == sent['subject'], sent['subject']
+        expected = {'head': 2, 'semantic': [2], 'phrase': [1, 2, 3, 4, 5, 6, 7, 8, 9]}
+        assert expected == sent['mainVerb'], sent['mainVerb']
+        expected = {'head': 1, 'semantic': [1], 'phrase': [1]}
+        assert expected == sent['subject'], sent['subject']
         assert not sent['compound']
         assert sent['complex']
         assert not sent['negated']
 
-        expected = {
-          1: {
-            'id': 1,
-            'sentenceId': 1,
-            'clauseType': 'relative',
-            'tokens': [3, 4, 5, 6, 7, 8],
-            'root': [4],
-            'mainVerb': [4],
-            'compound': False,
-            'complex': False,
-            'negated': False,
-            'parentClauseId': 2
-          },
-          2: {
-            'id': 2,
-            'sentenceId': 1,
-            'clauseType': 'matrix',
-            'tokens': [1, 2, 9],
-            'root': [2],
-            'mainVerb': [2],
-            'subject': 1,
-            'compound': False,
-            'complex': True,
-            'negated': False
-          }
-        }
+        expected = {1: {'id': 1, 'sentenceId': 1, 'clauseType': 'relative', 'tokens': [3, 4, 5, 6, 7, 8], 'root': [4], 'mainVerb': {'head': 4, 'semantic': [4], 'phrase': [3, 4, 5, 6, 7, 8]}, 'object': {'head': 8, 'semantic': [8], 'phrase': [5, 6, 7, 8]}, 'compound': False, 'complex': False, 'transitivity': 'transitive', 'negated': False, 'parentClauseId': 2}, 2: {'id': 2, 'sentenceId': 1, 'clauseType': 'matrix', 'tokens': [1, 2, 9], 'root': [2], 'mainVerb': {'head': 2, 'semantic': [2], 'phrase': [1, 2, 3, 4, 5, 6, 7, 8, 9]}, 'subject': {'head': 1, 'semantic': [1], 'phrase': [1]}, 'compound': False, 'complex': True, 'negated': False}}
         actual = nlp_json['documents'][1]['clauses']
         assert expected == actual, actual

@@ -159,6 +159,22 @@
         }
       }
     },
+    "grammar": {
+      "type": "object",
+      "required": ["head", "semantic", "phrase"],
+      "additionalProperties": false,
+      "properties": {
+        "head": {
+          "type": "integer"
+        },
+        "semantic": {
+          "$ref": "#/definitions/tokenIdList"
+        },
+        "phrase": {
+          "$ref": "#/definitions/tokenIdList"
+        }
+      }
+    },
     "nodeIdList": {
       "type": "array",
       "description": "Node id lists can be empty",
@@ -406,32 +422,16 @@
                   "type": "integer"
                 },
                 "mainVerb": {
-                  "type": "array",
-                  "description": "Token Ids corresponding to the main verb",
-                  "items": {
-                    "type": "integer"
-                  }
+                  "$ref": "#/definitions/grammar"
                 },
                 "subject": {
-                  "type": "array",
-                  "description": "Token Ids corresponding to the subject",
-                  "items": {
-                    "type": "integer"
-                  }
+                  "$ref": "#/definitions/grammar"
                 },
                 "object": {
-                  "type": "array",
-                  "description": "Token Ids corresponding to the object",
-                  "items": {
-                    "type": "integer"
-                  }
+                  "$ref": "#/definitions/grammar"
                 },
                 "indirectObject": {
-                  "type": "array",
-                  "description": "Token Ids corresponding to the indirect object",
-                  "items": {
-                    "type": "integer"
-                  }
+                  "$ref": "#/definitions/grammar"
                 },
                 "tokenFrom": {
                   "type": "integer",
@@ -517,32 +517,16 @@
                   "default": false
                 },
                 "mainVerb": {
-                  "type": "array",
-                  "description": "Token Ids corresponding to the main verb",
-                  "items": {
-                    "type": "integer"
-                  }
+                  "$ref": "#/definitions/grammar"
                 },
                 "subject": {
-                  "type": "array",
-                  "description": "Token Ids corresponding to the subject",
-                  "items": {
-                    "type": "integer"
-                  }
+                  "$ref": "#/definitions/grammar"
                 },
                 "object": {
-                  "type": "array",
-                  "description": "Token Ids corresponding to the object",
-                  "items": {
-                    "type": "integer"
-                  }
+                  "$ref": "#/definitions/grammar"
                 },
                 "indirectObject": {
-                  "type": "array",
-                  "description": "Token Ids corresponding to the indirect object",
-                  "items": {
-                    "type": "integer"
-                  }
+                  "$ref": "#/definitions/grammar"
                 },
                 "root": {
                   "description": "Token id corresponding to the root",
@@ -1086,13 +1070,13 @@
                   "type": "integer"
                 },
                 "predicate": {
-                  "$ref": "#/definitions/tokenIdList"
+                  "$ref": "#/definitions/grammar"
                 },
                 "from": {
-                  "$ref": "#/definitions/tokenIdList"
+                  "$ref": "#/definitions/grammar"
                 },
                 "to": {
-                  "$ref": "#/definitions/tokenIdList"
+                  "$ref": "#/definitions/grammar"
                 },
                 "modality": {
                   "$ref": "#/definitions/tokenIdList"

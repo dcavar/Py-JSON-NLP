@@ -1,8 +1,10 @@
-from collections import OrderedDict
-from typing import List, Union, Tuple
+from collections import OrderedDict, namedtuple
+from typing import List, Union, Tuple, Dict
 
 from pyjsonnlp.annotation import Annotator
 from pyjsonnlp.tokenization import subtract_tokens
+
+Dependency = namedtuple('Dep', 'dependent arc')  # int, str
 
 
 class DependencyParse:
@@ -22,33 +24,36 @@ class DependencyParse:
     def get_child_with_arc(self, token_id: int, arc: str) -> Union[None, OrderedDict]:
         raise NotImplementedError
 
+    def collect_compounds(self, token_id: int) -> List[OrderedDict]:
+        raise NotImplementedError
+
 
 class UniversalDependencyParse(DependencyParse):
     def __init__(self, dependencies: dict, tokens: OrderedDict):
-        self.deps = dependencies
-        self.tokens = tokens
-        self.nodes = {}
-        self.sentence_heads = {}  # sentenceId -> head
+        self.deps: dict = dependencies
+        self.tokens: OrderedDict = tokens
+        self.nodes: Dict[int, List[Dependency]] = {}
+        self.sentence_heads: Dict[int, int] = {}  # sentenceId -> head
         if dependencies.get('style', 'universal') != 'universal':
             raise ValueError(f"{dependencies['style']} is not universal!")
         self._build_nodes()
 
     def _build_nodes(self):
         for t in self.tokens.values():
-            arc = self.deps['arcs'][t['id']][0]
+            arc: dict = self.deps['arcs'][t['id']][0]
             if arc['governor'] not in self.nodes:
                 self.nodes[arc['governor']] = []
             if arc['governor'] == 0:
                 self.sentence_heads[arc['sentenceId']] = t['id']
-            self.nodes[arc['governor']].append((arc['dependent'], arc['label']))
+            self.nodes[arc['governor']].append(Dependency(dependent=arc['dependent'], arc=arc['label']))
 
     def is_arc_present_below(self, token_id: int, arc: str) -> bool:
         stack = list(self.nodes.get(token_id, []))
         while len(stack):
             dep = stack.pop()
-            if dep[1] == arc:
+            if dep.arc == arc:
                 return True
-            stack.extend(self.nodes.get(dep[0], []))
+            stack.extend(self.nodes.get(dep.dependent, []))
         return False
 
     @property
@@ -60,8 +65,8 @@ class UniversalDependencyParse(DependencyParse):
         stack = list(self.nodes.get(token_id, []))
         while len(stack):
             dep = stack.pop()
-            tokens.append(self.tokens[dep[0]])
-            stack.extend(self.nodes.get(dep[0], []))
+            tokens.append(self.tokens[dep.dependent])
+            stack.extend(self.nodes.get(dep.dependent, []))
 
         return sorted(tokens, key=lambda t: t['id'])
 
@@ -71,28 +76,42 @@ class UniversalDependencyParse(DependencyParse):
         stack = list(self.nodes.get(head, []))
         while len(stack):
             dep = stack.pop()
-            if dep[1] == arc:
-                return dep[0], self.get_leaves(dep[0])
-            stack.extend(self.nodes.get(dep[0], []))
+            if dep.arc == arc:
+                return dep.dependent, self.get_leaves(dep.dependent)
+            stack.extend(self.nodes.get(dep.dependent, []))
         return 0, []
 
-    def get_child_with_arc(self, token_id: int, arc: str) -> Union[None, OrderedDict]:
-        for dep, label in self.nodes.get(token_id, []):
-            if label == arc:
-                return dep,label
+    def get_child_with_arc(self, token_id: int, arc: str, follow: Tuple = ()) -> Union[None, OrderedDict]:
+        stack = list(self.nodes.get(token_id, []))
+        while len(stack):
+            dep = stack.pop()
+            if dep.arc == arc:
+                return self.tokens[dep.dependent]
+            if dep.arc in follow:
+                stack.extend(self.nodes.get(dep.dependent, []))
         return None
 
-    def get_token_dependencies(self, token_id: int)
-        if token_id in self.nodes.keys():
-            return self.nodes.get(token_id, [])
-        else:
-            return None
+    def collect_compounds(self, token_id: int) -> List[OrderedDict]:
+        compound = [self.tokens[token_id]]
+        stack = list(self.nodes.get(token_id, []))
+        while len(stack):
+            dep = stack.pop()
+            if dep.arc == 'compound':
+                compound.append(self.tokens[dep.dependent])
+                stack.extend(self.nodes.get(dep.dependent, []))
+
+        return sorted(compound, key=lambda t: t['id'])
 
 
 class DependencyAnnotator(Annotator):
     clause_arcs = ('csubj', 'ccomp', 'xcomp', 'advcl', 'acl')
     clause_types = (('csubj', 'subject'), ('xcomp', 'relative'), ('ccomp', 'complement'), ('advcl', 'adverbial'), ('acl', 'adjectival'))
     compound_arcs = ('conj', 'cc')
+    sov = (('subject', 'nsubj', ()),
+           ('object', 'obj', ()),
+           ('object', 'dobj', ()),
+           ('indirectObject', 'iobj', ()),
+           ('indirectObject', 'dative', ()))
 
     def annotate(self, nlp_json: OrderedDict) -> None:
         for doc in nlp_json['documents'].values():
@@ -150,44 +169,26 @@ class DependencyAnnotator(Annotator):
             clause['parentClauseId'] = parent_clause_id
         return clause
 
-    def build_compound_concepts(self, d: UniversalDependencyParse, head_token: int, node_token: int, item):
-        # head_token: Token from which the recursion starts
-        # node_token: Token, which the current recursion checks
-        # A DFS method where I check all the relation for the node_token.
-        # Store it in a list. Pop the first relation and do a while loop 
-        # till the list becomes empty. It does this at every depth.
-        relations = d.get_token_dependencies(node_token)
-        while(len(relations)>0):
-            tok, rel = relations.pop()
-            if relation == 'compound':
-                item[head_token]['comp_subj'].append(tok)
-            else:
-                item[head_token]['subj_phrase'].append(tok)
-            build_compound_concepts(d,head_token,tok,item)
-
+    @staticmethod
+    def build_grammar(d: UniversalDependencyParse, head: int) -> dict:
+        return {
+            'head': head,
+            'semantic': [t['id'] for t in d.collect_compounds(head)],
+            'phrase': [t['id'] for t in d.get_leaves(head)]
+        }
 
     def annotate_item(self, d: UniversalDependencyParse, head: int, item: dict) -> None:
         # root
         item['root'] = [head]
-        item['head'] = {'comp_subj':[],'subj_phrase':[]}
-        # subject/object/verb
-        if d.tokens[head]['upos'] == 'VERB':
-            item['mainVerb'] = [head]
-        for k, arc in (('subject', 'nsubj'), ('object', 'obj'), ('indirectObject', 'iobj'), ('indirectObject', 'dative')):
-            v, rel = d.get_child_with_arc(head, arc)
-            if v:
-                #if there is a new subj or obj, start the recursion.
-                #Here, both the head_token and node_token is head.
-                self.build_compound_concepts(d,head,head,item)
-                item[k] = v
 
-        # Adding the compound subject to the phrase
-        item[head]['subj_phrase'] += item[head]['comp_subj']
-        
-        # Getting the right sequence of tokens
-        item[head]['comp_subj'] = sorted(item[head]['comp_subj'])
-        item[head]['subj_phrase'] = sorted(item[head]['subj_phrase'])
-        
+        # subject/object/verb
+        if d.tokens[head]['upos'][0] == 'V' or d.tokens[head]['xpos'][0] == 'V':
+            item['mainVerb'] = self.build_grammar(d, head)
+        for k, arc, follow in self.sov:
+            grammar_head = d.get_child_with_arc(head, arc, follow)
+            if grammar_head:
+                item[k] = self.build_grammar(d, grammar_head['id'])
+
         # compound/complex/fragment
         item['compound'] = any(map(lambda a: d.is_arc_present_below(head, a), self.compound_arcs))
         item['complex'] = any(map(lambda a: d.is_arc_present_below(head, a), self.clause_arcs))
