@@ -153,7 +153,7 @@ def parse_conllu(c: str, dependency_arc_style='universal') -> OrderedDict:
             # multi-token expressions
             if '-' in str_token_id:
                 # this will be in the range token, not the word itself
-                if token.get('misc', defaultdict()).get('NewPar') == 'Yes':
+                if token.get('misc', defaultdict()).get('NewPar') == True:
                     new_paragraph_mid_sentence()
                 # ignore ranges otherwise during token parsing
                 continue
@@ -166,7 +166,7 @@ def parse_conllu(c: str, dependency_arc_style='universal') -> OrderedDict:
                 'upos': token['upostag'],  # universal pos
                 'xpos': token['xpostag'],  # language-specific pos
                 'features': OrderedDict({
-                    'Overt': 'Yes'
+                    'Overt': True
                 })
             }
             if token.get('feats'):
@@ -177,12 +177,12 @@ def parse_conllu(c: str, dependency_arc_style='universal') -> OrderedDict:
                 if 'Mseg' in t['misc']:
                     t['morphemes'] = t['misc']['Mseg'].split('-')
                 # new paragraph in the middle of a sentence
-                if t['misc'].get('NewPar') == 'Yes':
+                if t['misc'].get('NewPar') == True:
                     new_paragraph_mid_sentence()
 
             # non-overt tokens are represented as decimal ids in conll
             if '.' in str_token_id:
-                t['features']['Overt'] = 'No'
+                t['features']['Overt'] = False
 
             # bookkeeping
             token_lookup[(sent_num, str_token_id)] = token_id
