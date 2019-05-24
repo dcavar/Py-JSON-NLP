@@ -14,7 +14,7 @@ from collections import OrderedDict
 from typing import List
 
 name = "pyjsonnlp"
-__version__ = "0.2.12"
+__version__ = "0.2.13"
 
 
 def get_base() -> OrderedDict:
