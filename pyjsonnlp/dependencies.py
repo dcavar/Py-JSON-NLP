@@ -26,9 +26,9 @@ class DependencyParse:
 
 
 class UniversalDependencyParse(DependencyParse):
-    def __init__(self, dependencies: dict, tokens: OrderedDict):
+    def __init__(self, dependencies: dict, tokens: list):
         self.deps: dict = dependencies
-        self.tokens: OrderedDict = tokens
+        self.tokens: list = tokens
         self.nodes: Dict[int, List[Dependency]] = {}
         self.sentence_heads: Dict[int, int] = {}  # sentenceId -> head
         if dependencies.get('style', 'universal') != 'universal':
@@ -36,7 +36,7 @@ class UniversalDependencyParse(DependencyParse):
         self._build_nodes()
 
     def _build_nodes(self):
-        for t in self.tokens.values():
+        for t in self.tokens:
             arc: dict = self.deps['arcs'][t['id']][0]
             if arc['governor'] not in self.nodes:
                 self.nodes[arc['governor']] = []
@@ -58,11 +58,11 @@ class UniversalDependencyParse(DependencyParse):
         return self.deps.get('style', 'universal')
 
     def get_leaves(self, token_id: int) -> List[OrderedDict]:
-        tokens = [self.tokens[token_id]]
+        tokens = [self.tokens[token_id-1]]
         stack = list(self.nodes.get(token_id, []))
         while len(stack):
             dep = stack.pop()
-            tokens.append(self.tokens[dep.dependent])
+            tokens.append(self.tokens[dep.dependent-1])
             stack.extend(self.nodes.get(dep.dependent, []))
 
         return sorted(tokens, key=lambda t: t['id'])
@@ -83,18 +83,18 @@ class UniversalDependencyParse(DependencyParse):
         while len(stack):
             dep = stack.pop()
             if dep.arc == arc:
-                return self.tokens[dep.dependent]
+                return self.tokens[dep.dependent-1]
             if dep.arc in follow:
                 stack.extend(self.nodes.get(dep.dependent, []))
         return None
 
     def collect_compounds(self, token_id: int) -> List[OrderedDict]:
-        compound = [self.tokens[token_id]]
+        compound = [self.tokens[token_id-1]]
         stack = list(self.nodes.get(token_id, []))
         while len(stack):
             dep = stack.pop()
             if dep.arc == 'compound':
-                compound.append(self.tokens[dep.dependent])
+                compound.append(self.tokens[dep.dependent-1])
                 stack.extend(self.nodes.get(dep.dependent, []))
 
         return sorted(compound, key=lambda t: t['id'])
