@@ -14,7 +14,7 @@ from collections import OrderedDict
 from typing import List
 
 name = "pyjsonnlp"
-__version__ = "0.2.14"
+__version__ = "0.2.17"
 
 
 def get_base() -> OrderedDict:
@@ -46,7 +46,8 @@ def get_base() -> OrderedDict:
             "counts": {},
         },
         "conll": {},
-        "documents": {}
+        #"documents": {}
+        "documents": []
     })
 
 
