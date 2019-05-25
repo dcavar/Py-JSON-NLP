@@ -23,7 +23,8 @@ def to_conllu(j: OrderedDict) -> str:
     Baseline functionality is for Xrenner to be able to use spaCy dependencies to do coref
     """
     c = ""
-    for d in j['documents'].values():
+    #for d in j['documents'].values():
+    for d in j['documents']:
         c = f"{c}# newdoc id = {d['id']}\n"
         token_offset = 0
         for s in d['sentences'].values():
@@ -92,7 +93,8 @@ def parse_conllu(c: str, dependency_arc_style='universal') -> OrderedDict:
     def wrap_up_doc():
         if all(map(lambda ds: 'text' in ds, document['sentences'].values())):
             document['text'] = ' '.join(map(lambda ds: ds['text'], document['sentences'].values()))
-        j['documents'][document['id']] = document
+        #j['documents'][document['id']] = document
+        j['documents'].append(document)
 
     # init
     j: OrderedDict = get_base()

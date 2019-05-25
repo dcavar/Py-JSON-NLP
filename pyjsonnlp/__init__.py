@@ -14,7 +14,7 @@ from collections import OrderedDict
 from typing import List
 
 name = "pyjsonnlp"
-__version__ = "0.2.17"
+__version__ = "0.2.18"
 
 
 def get_base() -> OrderedDict:
@@ -98,8 +98,9 @@ def remove_empty_fields(json_nlp: OrderedDict) -> OrderedDict:
     if 'meta' in cleaned:
         cleaned['meta'] = remove_empty_fields(cleaned['meta'])
     if 'documents' in cleaned:
-        for i, d in cleaned['documents'].items():
-            cleaned['documents'][i] = remove_empty_fields(d)
+        #for i, d in cleaned['documents'].items():
+        for i in range(len(cleaned['documents'])):
+            cleaned['documents'][i] = remove_empty_fields(cleaned['documents'][i])
     return cleaned
 
 
