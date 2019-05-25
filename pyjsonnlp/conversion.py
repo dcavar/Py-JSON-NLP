@@ -33,9 +33,9 @@ def to_conllu(j: OrderedDict) -> str:
             for t_id in range(s['tokenFrom'], s['tokenTo']):
                 i += 1
                 head, rel = get_dep_head_rel(d, t_id)
-                text = tl[t_id].get('text')
+                text = tl[t_id-1].get('text')
                 # spacy pronoun "lemmas"
-                lemma = tl[t_id].get('lemma', '_') if tl[t_id].get('lemma', '_') != '-PRON-' else text
+                lemma = tl[t_id-1].get('lemma', '_') if tl[t_id-1].get('lemma', '_') != '-PRON-' else text
                 c = f"{c}{t_id-token_offset}" \
                     f"\t{text}" \
                     f"\t{lemma.lower()}" \
@@ -79,7 +79,7 @@ def parse_conllu(c: str, dependency_arc_style='universal') -> OrderedDict:
             document['paragraphs'][par_num] = {
                 'id': par_num,
                 'conllId': conll_id,
-                'tokens': [t_id for t_id in document['tokenList'].keys()]
+                'tokens': [t_id+1 for t_id in range(len(document['tokenList']))]
             }
             par_num += 1
         # create the new paragraph
@@ -189,7 +189,8 @@ def parse_conllu(c: str, dependency_arc_style='universal') -> OrderedDict:
             current_sent['tokens'].append(token_id)
             if document['paragraphs']:
                 document['paragraphs'][par_num]['tokens'].append('token_id')
-            document['tokenList'][token_id] = t
+            #document['tokenList'][token_id] = t
+            document['tokenList'].append(t)
             token_id += 1
 
         # expressions (now we handle id ranges)
