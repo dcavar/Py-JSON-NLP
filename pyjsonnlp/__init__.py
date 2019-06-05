@@ -14,7 +14,7 @@ from collections import OrderedDict
 from typing import List
 
 name = "pyjsonnlp"
-__version__ = "0.2.18"
+__version__ = "0.2.20"
 
 
 def get_base() -> OrderedDict:
@@ -118,8 +118,10 @@ def find_head(doc: OrderedDict, token_ids: List[int], style='universal') -> int:
     t_id = token_ids[0]
     if len(token_ids) > 1:
         token_ids = set(token_ids)  # faster lookup
-        while arcs[t_id][0]['governor'] in token_ids:
-            t_id = arcs[t_id][0]['governor']
+        #while arcs[t_id][0]['governor'] in token_ids:
+        while arcs[t_id]['gov'] in token_ids: 
+            #t_id = arcs[t_id][0]['governor']
+            t_id = arcs[t_id]['gov']
 
     return t_id
 
