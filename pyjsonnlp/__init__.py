@@ -104,26 +104,40 @@ def remove_empty_fields(json_nlp: OrderedDict) -> OrderedDict:
     return cleaned
 
 
-def find_head(doc: OrderedDict, token_ids: List[int], style='universal') -> int:
+def find_head(doc: OrderedDict, token_ids: List[int], sentence_id: int, style='universal') -> int:
     """
-    Given phrase, clause, or other group of token ids, use a dependency parse to find the head token
+    Given phrase, clause, or other group of token ids, use a dependency parse to find the head token.
+    We create two sets, governors and dependents of the tokens in token_ids. The elements in gov that do not occur
+    in dependents are the heads. There should be just one.
     """
-    if 'enhanced' in style.lower():
-        raise ValueError('A basic (single governor) dependency parse is required!')
-    try:
-        arcs = next((d['arcs'] for d in doc['dependencies'] if d['style'] == style))
-    except StopIteration:
-        raise ValueError('A basic (single governor) dependency parse was not found!')
+    arcs = doc['dependencies']['trees'][sentence_id - 1]
+    token_ids = set(token_ids)
+    govs = set()
+    deps = set()
+    for x in arcs:
+        if x["gov"] in token_ids:
+            govs.add(x["gov"])
+        if x["dep"] in token_ids:
+            deps.add(x["dep"])
+    govs = govs - deps
+    return govs[0]
 
-    t_id = token_ids[0]
-    if len(token_ids) > 1:
-        token_ids = set(token_ids)  # faster lookup
-        #while arcs[t_id][0]['governor'] in token_ids:
-        while arcs[t_id]['gov'] in token_ids: 
-            #t_id = arcs[t_id][0]['governor']
-            t_id = arcs[t_id]['gov']
-
-    return t_id
+#    if 'enhanced' in style.lower():
+#        raise ValueError('A basic (single governor) dependency parse is required!')
+#    try:
+#        arcs = next((d['arcs'] for d in doc['dependencies'] if d['style'] == style))
+#    except StopIteration:
+#        raise ValueError('A basic (single governor) dependency parse was not found!')
+#
+#    t_id = token_ids[0]
+#    if len(token_ids) > 1:
+#        token_ids = set(token_ids)  # faster lookup
+#        #while arcs[t_id][0]['governor'] in token_ids:
+#        while arcs[t_id]['gov'] in token_ids:
+#            #t_id = arcs[t_id][0]['governor']
+#            t_id = arcs[t_id]['gov']
+#
+#    return t_id
 
 
 def build_coreference(reference_id: int) -> dict:
