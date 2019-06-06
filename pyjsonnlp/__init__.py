@@ -14,7 +14,7 @@ from collections import OrderedDict
 from typing import List
 
 name = "pyjsonnlp"
-__version__ = "0.2.20"
+__version__ = "0.2.24"
 
 
 def get_base() -> OrderedDict:
@@ -110,7 +110,8 @@ def find_head(doc: OrderedDict, token_ids: List[int], sentence_id: int, style='u
     We create two sets, governors and dependents of the tokens in token_ids. The elements in gov that do not occur
     in dependents are the heads. There should be just one.
     """
-    arcs = doc['dependencies']['trees'][sentence_id - 1]
+    #print(sentence_id, doc['dependencies'],doc['dependencies']['trees'])
+    arcs = doc['dependencies']['trees'][sentence_id-1]
     token_ids = set(token_ids)
     govs = set()
     deps = set()
@@ -119,8 +120,11 @@ def find_head(doc: OrderedDict, token_ids: List[int], sentence_id: int, style='u
             govs.add(x["gov"])
         if x["dep"] in token_ids:
             deps.add(x["dep"])
-    govs = govs - deps
-    return govs[0]
+    govs = list(govs - deps)
+    if (len(govs)>0):
+        return govs[0]
+    else:
+        return None
 
 #    if 'enhanced' in style.lower():
 #        raise ValueError('A basic (single governor) dependency parse is required!')
