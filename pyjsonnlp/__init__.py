@@ -14,7 +14,7 @@ from collections import OrderedDict
 from typing import List
 
 name = "pyjsonnlp"
-__version__ = "0.2.24"
+__version__ = "0.2.29"
 
 
 def get_base() -> OrderedDict:
@@ -110,40 +110,8 @@ def find_head(doc: OrderedDict, token_ids: List[int], sentence_id: int, style='u
     We create two sets, governors and dependents of the tokens in token_ids. The elements in gov that do not occur
     in dependents are the heads. There should be just one.
     """
-    #print(sentence_id, doc['dependencies'],doc['dependencies']['trees'])
-    arcs = doc['dependencies']['trees'][sentence_id-1]
-    token_ids = set(token_ids)
-    govs = set()
-    deps = set()
-    for x in arcs:
-        if x["gov"] in token_ids:
-            govs.add(x["gov"])
-        if x["dep"] in token_ids:
-            deps.add(x["dep"])
-    govs = list(govs - deps)
-    if (len(govs)>0):
-        return govs[0]
-    else:
-        return None
-
-#    if 'enhanced' in style.lower():
-#        raise ValueError('A basic (single governor) dependency parse is required!')
-#    try:
-#        arcs = next((d['arcs'] for d in doc['dependencies'] if d['style'] == style))
-#    except StopIteration:
-#        raise ValueError('A basic (single governor) dependency parse was not found!')
-#
-#    t_id = token_ids[0]
-#    if len(token_ids) > 1:
-#        token_ids = set(token_ids)  # faster lookup
-#        #while arcs[t_id][0]['governor'] in token_ids:
-#        while arcs[t_id]['gov'] in token_ids:
-#            #t_id = arcs[t_id][0]['governor']
-#            t_id = arcs[t_id]['gov']
-#
-#    return t_id
-
-
+    
+                
 def build_coreference(reference_id: int) -> dict:
     """Build a frame for a coreference structure"""
 
