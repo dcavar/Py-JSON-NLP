@@ -111,20 +111,18 @@ def find_head(doc: OrderedDict, token_ids: List[int], sentence_id: int, style='u
     in dependents are the heads. There should be just one.
     """
     #print(sentence_id, doc['dependencies'],doc['dependencies']['trees'])
-    arcs = doc['dependencies']['trees'][sentence_id-1]
-    token_ids = set(token_ids)
-    govs = set()
-    deps = set()
-    for x in arcs:
-        if x["gov"] in token_ids:
-            govs.add(x["gov"])
-        if x["dep"] in token_ids:
-            deps.add(x["dep"])
-    govs = list(govs - deps)
-    if (len(govs)>0):
-        return govs[0]
-    else:
+    if len(token_ids) == 0:
         return None
+    arcs = doc['dependencies']['trees'][sentence_id-1]
+    govs = set(token_ids)
+    for x in arcs:
+        if x["dep"] in govs and x["gov"] in govs:
+            govs.remove(x["dep"])
+    govs = list(govs)
+    if len(govs) == 0:
+        return None
+    return govs[0]
+
 
 #    if 'enhanced' in style.lower():
 #        raise ValueError('A basic (single governor) dependency parse is required!')
