@@ -14,7 +14,7 @@ from collections import OrderedDict
 from typing import List
 
 name = "pyjsonnlp"
-__version__ = "0.2.30"
+__version__ = "0.2.33"
 
 
 def get_base() -> OrderedDict:
@@ -113,7 +113,7 @@ def find_head(doc: OrderedDict, token_ids: List[int], sentence_id: int, style='u
     #print(sentence_id, doc['dependencies'],doc['dependencies']['trees'])
     if len(token_ids) == 0:
         return None
-    arcs = doc['dependencies']['trees'][sentence_id-1]
+    arcs = doc['dependencies'][sentence_id-1]['trees']
     govs = set(token_ids)
     for x in arcs:
         if x["dep"] in govs and x["gov"] in govs:

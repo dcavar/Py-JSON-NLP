@@ -1,6 +1,6 @@
 # Python JSON-NLP Module
 
-(C) 2019 by [Damir Cavar], [Oren Baldinger], [Maanvitha Gongalla], Anurag Kumar, Murali Kammili
+(C) 2019 by [Damir Cavar], [Oren Baldinger], [Maanvitha Gongalla], [Anurag Kumar], Murali Kammili
 
 Brought to you by the [NLP-Lab.org]!
 
@@ -112,6 +112,7 @@ Other parameters specific to your pipeline implementation can be passed as well:
 
 [Damir Cavar]: http://damir.cavar.me/ "Damir Cavar"
 [Oren Baldinger]: https://oren.baldinger.me/ "Oren Baldinger"
+[Anurag Kumar]: https://github.com/anuragkumar95/ "Anurag Kumar"
 [Maanvitha Gongalla]: https://maanvithag.github.io/MaanvithaGongalla/
 [NLP-Lab.org]: http://nlp-lab.org/ "NLP-Lab.org"
 [JSON-NLP]: https://github.com/dcavar/JSON-NLP "JSON-NLP"
