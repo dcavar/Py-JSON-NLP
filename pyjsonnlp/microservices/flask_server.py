@@ -81,6 +81,10 @@ class FlaskMicroservice(Microservice, Flask):
         args = dict((k, map_value(k, v)) for k, v in request.args.items())
         for k, v in request.form.items():
             args[k] = map_value(k, v)
+        if request.is_json:
+            data = request.get_json()
+            for k, v in data.items():
+                args[k] = map_value(k, v)
 
         return args
 
