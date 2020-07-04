@@ -1,7 +1,7 @@
 """
 validator.py
 
-(C) 2019 Oren Baldinger, Damir Cavar
+(C) 2020 Oren Baldinger, Damir Cavar
 
 Validates the results of pipelines against the NLP-JSON schema.
 """

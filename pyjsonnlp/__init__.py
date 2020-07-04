@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 """
-(C) 2019 Damir Cavar, Oren Baldinger, Maanvitha Gongalla, Anurag Kumar, Murali Kammili
+(C) 2020 by Semiring Inc., Damir Cavar
+
+Contributions to earlier versions by Oren Baldinger, Maanvitha Gongalla, Anurag Kumar, Murali Kammili
 
 Functions for manipulating and expanding a JSON-NLP object
 
@@ -14,7 +16,7 @@ from collections import OrderedDict
 from typing import List
 
 name = "pyjsonnlp"
-__version__ = "0.2.33"
+__version__ = "0.6"
 
 
 def get_base() -> OrderedDict:
@@ -27,6 +29,7 @@ def get_base() -> OrderedDict:
     return OrderedDict({
         "meta": {
             "DC.conformsTo": __version__,
+            "DC.author": "",
             "DC.source": "",  # where did the corpus come from
             "DC.created": datetime.datetime.now().replace(microsecond=0).isoformat(),
             "DC.date": datetime.datetime.now().replace(microsecond=0).isoformat(),
@@ -46,7 +49,6 @@ def get_base() -> OrderedDict:
             "counts": {},
         },
         "conll": {},
-        #"documents": {}
         "documents": []
     })
 
@@ -57,6 +59,7 @@ def get_base_document(doc_id: int) -> OrderedDict:
     return OrderedDict({
         "meta": {
             "DC.conformsTo": __version__,
+            "DC.author": "",
             "DC.source": "",  # where did the corpus come from
             "DC.created": datetime.datetime.now().replace(microsecond=0).isoformat(),
             "DC.date": datetime.datetime.now().replace(microsecond=0).isoformat(),
@@ -79,9 +82,9 @@ def get_base_document(doc_id: int) -> OrderedDict:
         "conllId": "",
         "text": "",
         "tokenList": [],
-        #"clauses": {},
-        "sentences": {},
-        "paragraphs": {},
+        "clauses": [],
+        "sentences": [],
+        "paragraphs": [],
         "dependencies": [],
         "coreferences": [],
         "constituents": [],
