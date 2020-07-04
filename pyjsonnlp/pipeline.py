@@ -3,7 +3,7 @@
 
 Interface for the NLP pipelines.
 Licensed under the Apache License 2.0, see the file LICENSE for more details.
-Brought to you by the NLP-Lab.org (https://nlp-lab.org/)!
+Brought to you by the NLP-Lab.org (https://nlp-lab.org/) and Semiring Inc.!
 """
 
 from collections import OrderedDict
