@@ -1,5 +1,5 @@
 """
-(C) 2019 Damir Cavar, Oren Baldinger, Maanvitha Gongalla, Anurag Kumar, Murali Kammili
+(C) 2019-2020 Damir Cavar, Oren Baldinger, Maanvitha Gongalla, Anurag Kumar, Murali Kammili
 
 Interface for the NLP pipelines.
 Licensed under the Apache License 2.0, see the file LICENSE for more details.
